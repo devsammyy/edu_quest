@@ -1,6 +1,6 @@
 import { View, Text, SafeAreaView } from "react-native";
 import { Tabs } from "expo-router";
-import TabIcon from "@/components/tabs/tab_icon";
+import TabIcon from "@/components/tab/tab_icon";
 import { icons } from "../../constants";
 
 const TabLayout = () => {
