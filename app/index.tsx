@@ -36,7 +36,7 @@ const LandingPage = () => {
 
           <CustomButton
             title="Continue"
-            handlePress={() => router.push("/register")}
+            handlePress={() => router.replace("/register")}
             containerStyles="w-full mt-7"
           />
         </View>

@@ -1,8 +1,14 @@
-import { View, Text, ScrollView, GestureResponderEvent } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  GestureResponderEvent,
+  TouchableOpacity,
+} from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import RegisterComponent from "@/components/auth/register";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import LoginComponent from "@/components/auth/login";
 
 const Register = () => {
@@ -16,12 +22,14 @@ const Register = () => {
             <Text className="text-lg font-pregular text-gray-100">
               Don't have account?
             </Text>
-            <Link
-              href={"/register"}
-              className="text-lg font-psemibold text-main"
+            <TouchableOpacity
+              onPress={() => router.replace("/register")}
+              className="my-3 items-end"
             >
-              Register
-            </Link>
+              <Text className="text-lg font-psemibold text-main">
+                Register?
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>

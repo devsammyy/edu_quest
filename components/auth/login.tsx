@@ -1,11 +1,14 @@
-import { Text, View, Image } from "react-native";
+import { Text, View, Image, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import CustomButton from "../button/custom_btn";
 import CTextInput from "../inputs/text_input";
 import { ErrorMessage, Formik, FormikProps } from "formik";
 import * as Yup from "yup";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { images } from "@/constants";
+import { useUserState } from "@/modules/auth/context";
+import { IUser } from "@/modules/auth/model";
+import CMessageModal from "../modal/modal";
 
 const LoginSchema = Yup.object().shape({
   username: Yup.string()
@@ -14,17 +17,28 @@ const LoginSchema = Yup.object().shape({
     .required("Username is required"),
 
   password: Yup.string()
-    .min(6, "Password is too short")
+    .min(4, "Password is too short")
     .max(50, "Password is too long")
     .required("Password is required"),
 });
 
 const LoginComponent = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { login, fetchingState, setFetchingState, loading } = useUserState();
+  const [status, setStatus] = useState("");
+  const [showModal, setShowModal] = useState(false);
 
-  const handleSubmission = (values: any) => {
-    console.log(values);
-    alert("Holla");
+  const handleSubmission = async (values: IUser) => {
+    try {
+      await login(values.username, values.password);
+      setStatus("Success");
+      setShowModal(true);
+      setTimeout(() => {
+        router.replace("/home");
+      }, 3000);
+    } catch (error) {
+      setStatus("Error");
+      setShowModal(true);
+    }
   };
 
   return (
@@ -40,13 +54,10 @@ const LoginComponent = () => {
       <Formik
         initialValues={{
           username: "",
-          email: "",
-          matricNo: "",
-          fullName: "",
           password: "",
         }}
         validationSchema={LoginSchema}
-        onSubmit={(values) => handleSubmission(values)}
+        onSubmit={(values) => handleSubmission(values as any)}
       >
         {({
           values,
@@ -90,20 +101,36 @@ const LoginComponent = () => {
               </Text>
             ) : null}
 
-            <View className="flex-1 my-3 items-end">
-              <Link href="/forgot" className="text-lg font-psemibold text-main">
+            <TouchableOpacity
+              onPress={() => router.replace("/change")}
+              className="flex-1 my-3 items-end"
+            >
+              <Text className="text-lg font-psemibold text-main">
                 Forgot Password?
-              </Link>
-            </View>
+              </Text>
+            </TouchableOpacity>
 
             <CustomButton
-              title={`${isSubmitting ? "Please wait..." : "Login"}`}
+              title={`${loading ? "Please wait..." : "Login"}`}
               handlePress={handleSubmit}
               containerStyles="mt-3"
             />
           </View>
         )}
       </Formik>
+      {status ? (
+        <CMessageModal
+          visible={showModal}
+          title={`${status === "Success" ? "Success" : "Error!"}`}
+          message={`${status === "Success" ? fetchingState : fetchingState}`}
+          additionalMessage={`${
+            status === "Success" ? "You will be redirected to the homepage" : ""
+          }`}
+          onClose={() => setShowModal(!showModal)}
+          className="rounded-lg"
+          type={`${status === "Success" ? "success" : "error"}`}
+        />
+      ) : null}
     </View>
   );
 };

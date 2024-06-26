@@ -5,6 +5,10 @@ import CTextInput from "../inputs/text_input";
 import { ErrorMessage, Formik, FormikProps } from "formik";
 import * as Yup from "yup";
 import { images } from "@/constants";
+import CMessageModal from "../modal/modal";
+import { Link, router } from "expo-router";
+import { useUserState } from "@/modules/auth/context";
+import { TouchableOpacity } from "react-native";
 
 const RegisterSchema = Yup.object().shape({
   username: Yup.string()
@@ -30,10 +34,23 @@ const RegisterSchema = Yup.object().shape({
 });
 
 const RegisterComponent = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { registerUser, setFetchingState, fetchingState, loading } =
+    useUserState();
+  const [status, setStatus] = useState("");
+  const [showModal, setShowModal] = useState(false);
 
-  const handleSubmission = (values: any) => {
-    alert("Holla");
+  const handleSubmission = async (values: any) => {
+    try {
+      await registerUser(values);
+      setStatus("Success");
+      setShowModal(true);
+      setTimeout(() => {
+        router.replace("/login");
+      }, 3000);
+    } catch (error) {
+      setStatus("Error");
+      setShowModal(true);
+    }
   };
 
   return (
@@ -149,13 +166,40 @@ const RegisterComponent = () => {
             ) : null}
 
             <CustomButton
-              title={`${isSubmitting ? "Please wait..." : "Register"}`}
+              title={`${loading ? "Please wait..." : "Register"}`}
               handlePress={handleSubmit}
-              containerStyles="mt-3"
+              containerStyles="mt-5"
             />
+            <View className="justify-center pt-5 flex-row gap-2">
+              <Text className="text-lg font-pregular text-gray-100">
+                Already have an account?
+              </Text>
+              <TouchableOpacity
+                onPress={() => {
+                  router.replace("/login");
+                }}
+              >
+                <Text className="text-lg font-psemibold text-main">Login</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         )}
       </Formik>
+      {status ? (
+        <CMessageModal
+          visible={showModal}
+          title={`${status === "Success" ? "Success" : "Error!"}`}
+          message={`${status === "Success" ? fetchingState : fetchingState}`}
+          additionalMessage={`${
+            status === "Success"
+              ? "You will be redirected to the login page"
+              : ""
+          }`}
+          onClose={() => setShowModal(!showModal)}
+          className="rounded-lg"
+          type={`${status === "Success" ? "success" : "error"}`}
+        />
+      ) : null}
     </View>
   );
 };

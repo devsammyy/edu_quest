@@ -10,7 +10,8 @@
     "release": {
       "android": {
         "buildType": "apk",
-        "gradleCommand": ":app:bundleRelease"
+        "gradleCommand": ":app:assembleRelease",
+        "withoutCredentials": true
       }
     },
     "preview": {
