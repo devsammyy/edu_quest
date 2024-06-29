@@ -1,14 +1,61 @@
-import { View, Text, FlatList, TouchableOpacity, Image } from "react-native";
-import React, { useEffect } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  Image,
+  Alert,
+} from "react-native";
+import React, { useEffect, useState } from "react";
 import { useUserState } from "@/modules/auth/context";
 
 import SearchInput from "../search/search-input";
 import { icons } from "@/constants";
 import { useQuestionState } from "@/modules/question/context";
+import EmptyState from "../empty/empty";
+import { SafeAreaView } from "react-native-safe-area-context";
+import CustomButton from "../button/custom_btn";
+import History from "./history";
+import { getData } from "@/modules/challenge/service";
 
 const Home = () => {
   const { user, users } = useUserState();
   const { questions, getQuestions } = useQuestionState();
+  const [quizResults, setQuizResults] = useState([]);
+  const [points, setPoints] = useState(0);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userQuizResults = (await getData("quiz_results")) || [];
+        const userResults = userQuizResults.filter(
+          (result: any) => result.userId === user?.id
+        );
+        setQuizResults(userResults);
+
+        const userProgress = (await getData(`user_${user?.id}_progress`)) || {
+          points: 0,
+        };
+        setPoints(userProgress.points);
+      } catch (error) {
+        console.error(error);
+        Alert.alert("Error", "Failed to fetch user data.");
+      }
+    };
+    fetchUserData();
+  }, [user?.id]);
+
+  const getLevelProgress = (level: any) => {
+    const levelResults = quizResults.filter((result) => result.level === level);
+    const totalQuestions = questions.filter(
+      (q) => q.difficulty === level
+    ).length;
+    const totalCorrect = levelResults.reduce(
+      (acc, result) => acc + result.score,
+      0
+    );
+    return (totalCorrect / totalQuestions) * 100;
+  };
 
   useEffect(() => {
     getQuestions("physics");
@@ -16,12 +63,11 @@ const Home = () => {
 
   return (
     <FlatList
-      data={questions}
+      data={[{ id: 1 }]}
       keyExtractor={(item) => item.id.toString()}
       renderItem={({ item }) => (
         <View>
           <Text className="text-white">{item.id}</Text>
-          <Text className="text-white">{item.question}</Text>
         </View>
       )}
       ListHeaderComponent={() => (
@@ -47,8 +93,32 @@ const Home = () => {
             </View>
           </View>
 
-          <SearchInput placeholder="Search for a topic/quiz" />
+          <SearchInput
+            placeholder="Search for a subject
+          "
+          />
+          <View className="pt-2 flex-1 w-full">
+            <Text className="text-gray-300 text-lg font-psemibold mb-3">
+              Your Journey So Far!
+            </Text>
+          </View>
+          <History
+            data={[
+              { id: 1, name: "Babatunde", email: "babatunde@email.com" },
+              { id: 2, name: "Joshua", email: "Joshua@email.com" },
+              { id: 3, name: "Joshua", email: "Joshua@email.com" },
+              { id: 4, name: "Joshua", email: "Joshua@email.com" },
+
+              { id: 5, name: "Joshua", email: "Joshua@email.com" },
+            ]}
+          />
         </View>
+      )}
+      ListEmptyComponent={() => (
+        <EmptyState
+          title="You haven't started any Quest"
+          subtitle="Please proceed to challenge page"
+        />
       )}
     />
   );

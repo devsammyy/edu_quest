@@ -1,16 +1,12 @@
-import { View, Text, SafeAreaView, ScrollView } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import React from "react";
+import ChallengeComponent from "@/components/challenge/challenge";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Challenge = () => {
   return (
     <SafeAreaView className="bg-primary h-full">
-      <ScrollView>
-        <View className="w-full items-center justify-center min-h-[86vh] px-4 my-6">
-          <Text className="text-white font-pbold text-lg">
-            Challenge screen Under Construction...
-          </Text>
-        </View>
-      </ScrollView>
+      <ChallengeComponent />
     </SafeAreaView>
   );
 };

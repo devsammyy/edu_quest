@@ -25,7 +25,7 @@ const SearchInput: React.FC<IProps> = ({
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   return (
-    <View className="border-2 border-black w-full h-16 px-4 bg-black rounded-2xl focus:border-main items-center flex-row space-x-4">
+    <View className="border-2 border-slate-900 w-full h-16 px-4 bg-slate-800 rounded-2xl focus:border-main items-center flex-row space-x-4">
       <TextInput
         className="text-base mt-0.5 text-white flex-1 font-pregular"
         value={value}

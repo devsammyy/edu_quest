@@ -1,8 +1,6 @@
-import * as SecureStore from "expo-secure-store";
-import { IQuestion } from "./model";
+import { IAllQuestions, IQuestion } from "./model";
 import { english, physics, chemistry, englisMispellet } from "./questions";
 
-// Helper function to get all questions from SecureStore
 export const getSingleQuestionsByName = async (
   name: "english" | "physics" | "chemistry" | "mispelled"
 ) => {
@@ -26,6 +24,15 @@ export const getSingleQuestionsByName = async (
   } catch (error) {
     throw new Error("Error retrieving questions");
   }
+};
+
+export const getAllofQuestions = async () => {
+  return [
+    { id: 1, name: "English", questions: english },
+    { id: 2, name: "Physics", questions: physics },
+    { id: 3, name: "Chemistry", questions: chemistry },
+    { id: 4, name: "Mispelled", questions: englisMispellet },
+  ];
 };
 
 export const getSingleQuestionById = async (id: number) => {

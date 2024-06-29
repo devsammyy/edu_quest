@@ -10,5 +10,8 @@ const icons = {
   novice: require("../assets/icons/novice.png"),
   intermediate: require("../assets/icons/intermediate.png"),
   advanced: require("../assets/icons/advanced.png"),
+  atom: require("../assets/icons/atom.png"),
+  enzyme: require("../assets/icons/enzyme.png"),
+  vocabulary: require("../assets/icons/vocabulary.png"),
 };
 export default icons;

@@ -1,6 +1,10 @@
 import React, { useState, createContext } from "react";
 import { IQuestion } from "./model";
-import { getSingleQuestionsByName, getSingleQuestionById } from "./service";
+import {
+  getSingleQuestionsByName,
+  getSingleQuestionById,
+  getAllofQuestions,
+} from "./service";
 
 interface IQuestionState {
   loading: boolean;
@@ -11,6 +15,9 @@ interface IQuestionState {
   questions: IQuestion[];
   setQuestions: (questions: IQuestion[]) => void;
   getQuestions: (name: string) => Promise<void>;
+  allQuestions: any;
+  setAllQuestions: (all: []) => void;
+  getAllQuestions: () => Promise<void>;
 }
 
 const QuestionContext = createContext<IQuestionState>({
@@ -24,8 +31,10 @@ const QuestionContext = createContext<IQuestionState>({
   getQuestion: (filter) => {
     return Promise.resolve();
   },
-
   getQuestions: () => Promise.resolve(),
+  allQuestions: [],
+  setAllQuestions: () => Promise.resolve([]),
+  getAllQuestions: () => Promise.resolve(),
 });
 
 export const useQuestionState = () => {
@@ -44,6 +53,7 @@ export const QuestionContextProvider: React.FC<IProps> = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [questions, setQuestions] = useState<IQuestion[]>([]);
   const [question, setQuestion] = useState<IQuestion | null>(null);
+  const [allQuestions, setAllQuestions] = useState<[]>([]);
 
   const getQuestions = async (name: string) => {
     setLoading(true);
@@ -70,6 +80,19 @@ export const QuestionContextProvider: React.FC<IProps> = ({ children }) => {
     }
   };
 
+  const getAllQuestions = async () => {
+    setLoading(true);
+
+    try {
+      const allQuestions = await getAllofQuestions();
+      setAllQuestions(allQuestions as any);
+    } catch (error) {
+      console.error("Error getting users data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <QuestionContext.Provider
       value={{
@@ -79,6 +102,9 @@ export const QuestionContextProvider: React.FC<IProps> = ({ children }) => {
         setQuestions,
         setQuestion,
         setLoading,
+        allQuestions,
+        getAllQuestions,
+        setAllQuestions,
         question,
         questions,
       }}
