@@ -39,29 +39,29 @@ const ChallengeComponent = () => {
   }, []);
   if (loading) {
     return <Text>Loading...</Text>;
-  } else
-    return (
-      <FlatList
-        data={question}
-        keyExtractor={(item: any) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View className=" px-1">
-            <View>
-              {question.length > 0 && (
-                <QuestionCard name={item.name} icon={mapIcon(item.name)} />
-              )}
-            </View>
+  }
+  return (
+    <FlatList
+      data={question}
+      keyExtractor={(item: any) => item.id.toString()}
+      renderItem={({ item }) => (
+        <View className=" px-1">
+          <View>
+            {question.length > 0 && (
+              <QuestionCard name={item.name} icon={mapIcon(item.name)} />
+            )}
           </View>
-        )}
-        numColumns={2}
-        ListHeaderComponent={() => (
-          <Text className="font-psemibold text-white my-6 px-4 text-2xl">
-            All Categories
-          </Text>
-        )}
-        // horizontal
-      />
-    );
+        </View>
+      )}
+      numColumns={2}
+      ListHeaderComponent={() => (
+        <Text className="font-psemibold text-white my-6 px-4 text-2xl">
+          All Categories
+        </Text>
+      )}
+      // horizontal
+    />
+  );
 };
 
 export default ChallengeComponent;

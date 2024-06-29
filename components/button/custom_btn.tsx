@@ -9,18 +9,21 @@ import React, { FormEvent } from "react";
 interface ICustomButton {
   title: string;
   handlePress?: any;
+  disabled: boolean;
   containerStyles: any;
 }
 
 const CustomButton: React.FC<ICustomButton> = ({
   title,
   handlePress,
+  disabled,
   containerStyles,
 }) => {
   return (
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={handlePress}
+      disabled={disabled}
       className={` bg-main rounded-xl min-h-[62px] justify-center items-center ${containerStyles}`}
     >
       <Text className="text-primary text-lg font-psemibold">{title}</Text>

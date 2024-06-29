@@ -1609,7 +1609,7 @@ export const englisMispellet = [
     id: 3,
     difficulty: "easy",
     question: "Which word is spelled correctly?",
-    options: ["Accommodate", "Acommodate", "Accomodate", "Acommodate"],
+    options: ["Accommodate", "Acommodate", "Accomodate", "Akommodate"],
     answer: "Accommodate",
   },
   {
@@ -1658,7 +1658,7 @@ export const englisMispellet = [
     id: 10,
     difficulty: "easy",
     question: "Which word is spelled correctly?",
-    options: ["Febuary", "February", "Febraury", "Febraury"],
+    options: ["Febuary", "February", "Febraury", "Febhuary"],
     answer: "February",
   },
   {
