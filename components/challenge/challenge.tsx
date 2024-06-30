@@ -1,14 +1,10 @@
 import { View, Text, FlatList } from "react-native";
 import React, { useEffect, useState } from "react";
-import { useUserState } from "@/modules/auth/context";
 import QuestionCard from "./single-card";
 import { icons } from "@/constants";
-import { useQuestionState } from "@/modules/question/context";
 import { getAllofQuestions } from "@/modules/question/service";
 
 const ChallengeComponent = () => {
-  const { questions, loading, getAllQuestions, allQuestions, getQuestions } =
-    useQuestionState();
   const [question, setQuestion] = useState([]);
 
   const mapIcon = (icon: string) => {
@@ -37,9 +33,7 @@ const ChallengeComponent = () => {
   useEffect(() => {
     fetchAllQuestions();
   }, []);
-  if (loading) {
-    return <Text>Loading...</Text>;
-  }
+
   return (
     <FlatList
       data={question}

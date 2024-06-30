@@ -1,13 +1,13 @@
-import { View, Text, ScrollView } from "react-native";
+import { View } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import PhysicsQuestion from "@/components/challenge/physics/physics";
+import Question from "@/components/challenge/component/question";
 
 const Physics = () => {
   return (
     <SafeAreaView className="bg-primary h-full">
       <View className="w-full items-center justify-center min-h-[83vh] px-4 my-6">
-        <PhysicsQuestion />
+        <Question subject={"physics"} difficulty={"easy"} />
       </View>
     </SafeAreaView>
   );

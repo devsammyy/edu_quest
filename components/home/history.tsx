@@ -13,7 +13,6 @@ const History: React.FC<IProps> = ({ data }) => {
       keyExtractor={(item) => item.id.toString()}
       renderItem={({ item }) => (
         <View>
-          <RecentChallengeCard />
           <Text className="text-white">{item.id}</Text>
           <Text className="text-white">{item.name}</Text>
           <Text className="text-white">{item.email}</Text>

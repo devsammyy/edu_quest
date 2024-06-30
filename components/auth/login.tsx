@@ -114,6 +114,7 @@ const LoginComponent = () => {
               title={`${loading ? "Please wait..." : "Login"}`}
               handlePress={handleSubmit}
               containerStyles="mt-3"
+              disabled={false}
             />
           </View>
         )}

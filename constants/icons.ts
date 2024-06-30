@@ -1,7 +1,7 @@
 const icons = {
   home: require("../assets/icons/home.png"),
   learn: require("../assets/icons/read.png"),
-  profile: require("../assets/icons/user.png"),
+  profile: require("../assets/icons/woman.png"),
   settings: require("../assets/icons/settings.png"),
   challenge: require("../assets/icons/challenge.png"),
   eye: require("../assets/icons/eye.png"),
@@ -13,5 +13,7 @@ const icons = {
   atom: require("../assets/icons/atom.png"),
   enzyme: require("../assets/icons/enzyme.png"),
   vocabulary: require("../assets/icons/vocabulary.png"),
+  winning: require("../assets/icons/winning.png"),
+  usericon: require("../assets/icons/usericon.png"),
 };
 export default icons;

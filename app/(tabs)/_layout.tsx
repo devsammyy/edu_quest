@@ -60,7 +60,7 @@ const TabLayout = () => {
                 color={color}
                 name="Profile"
                 focused={focused}
-                icon={icons.profile}
+                icon={icons.usericon}
               />
             ),
           }}
