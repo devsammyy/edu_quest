@@ -15,5 +15,7 @@ const icons = {
   vocabulary: require("../assets/icons/vocabulary.png"),
   winning: require("../assets/icons/winning.png"),
   usericon: require("../assets/icons/usericon.png"),
+  envelope: require("../assets/icons/envelope.png"),
+  padlock: require("../assets/icons/padlock.png"),
 };
 export default icons;
