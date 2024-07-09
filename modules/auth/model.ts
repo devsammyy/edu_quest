@@ -5,4 +5,5 @@ export interface IUser {
   matricNo: string;
   fullName: string;
   password: string;
+  setupCompleted: boolean;
 }

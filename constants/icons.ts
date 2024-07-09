@@ -17,5 +17,7 @@ const icons = {
   usericon: require("../assets/icons/usericon.png"),
   envelope: require("../assets/icons/envelope.png"),
   padlock: require("../assets/icons/padlock.png"),
+  logout: require("../assets/icons/logout.png"),
+  greater: require("../assets/icons/greater.png"),
 };
 export default icons;

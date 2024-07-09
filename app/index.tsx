@@ -1,12 +1,31 @@
 import { Image, StyleSheet, Text, View, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React from "react";
+import React, { useEffect } from "react";
 import { Redirect, router } from "expo-router";
 import { images } from "../constants";
 import CustomButton from "@/components/button/custom_btn";
+import * as SecureStore from "expo-secure-store";
 import { StatusBar } from "expo-status-bar";
 
 const LandingPage = () => {
+  const handleNavigate = async () => {
+    await SecureStore.setItemAsync("setupCompleted", JSON.stringify(true)).then(
+      (_) => {
+        router.replace("/register");
+      }
+    );
+  };
+
+  useEffect(() => {
+    const checkSetup = async () => {
+      const isSetupCompleted = await SecureStore.getItemAsync("setupCompleted");
+
+      if (isSetupCompleted) {
+        router.replace("/login");
+      }
+    };
+    checkSetup();
+  }, []);
   return (
     <SafeAreaView className="h-full bg-primary">
       <ScrollView>
@@ -36,8 +55,9 @@ const LandingPage = () => {
 
           <CustomButton
             title="Continue"
-            handlePress={() => router.replace("/register")}
+            handlePress={handleNavigate}
             containerStyles="w-full mt-7"
+            disabled={false}
           />
         </View>
         <StatusBar style="dark" backgroundColor="#161622" />

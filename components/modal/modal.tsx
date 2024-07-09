@@ -35,13 +35,13 @@ const CMessageModal: React.FC<ICMessage> = ({
     if (visible) {
       Animated.spring(scaleValue, {
         toValue: 1,
-        friction: 5,
+        friction: 3,
         useNativeDriver: true,
       }).start();
     } else {
       Animated.spring(scaleValue, {
         toValue: 0,
-        friction: 5,
+        friction: 3,
         useNativeDriver: true,
       }).start();
     }

@@ -1,55 +1,32 @@
 import CustomButton from "@/components/button/custom_btn";
+import CMessageModal from "@/components/modal/modal";
 import { useUserState } from "@/modules/auth/context";
-import { deleteData, getData, saveData } from "@/modules/challenge/service";
+import { getData, saveData } from "@/modules/challenge/service";
 import { useQuestionState } from "@/modules/question/context";
+import { router } from "expo-router";
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  Button,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-} from "react-native";
+import { View, Text, FlatList, TouchableOpacity, Alert } from "react-native";
 
-const PhysicsQuestion = () => {
+interface IProps {
+  subject: string | any;
+  difficulty: string | string[] | undefined;
+}
+
+const Question: React.FC<IProps> = ({ subject, difficulty }) => {
   const { user } = useUserState();
   const { questions, getQuestions } = useQuestionState();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
-  const filteredQuestions = questions.filter((q) => q.difficulty === "easy");
+  const [showModal, setShowModal] = useState(false);
+  const filteredQuestions = questions.filter(
+    (q) => q.difficulty === difficulty
+  );
   const optionLabels = ["A", "B", "C", "D"];
 
   useEffect(() => {
-    loadProgress();
-    getQuestions("mispelled");
+    getQuestions(subject);
   }, []);
-
-  const loadProgress = async () => {
-    try {
-      const progress = await getData(`progress_${user?.id}_${"easy"}`);
-      if (progress) {
-        setCurrentQuestionIndex(progress.currentQuestionIndex);
-        setScore(progress.score);
-      }
-    } catch (error) {
-      console.error("Failed to load progress:", error);
-    }
-  };
-
-  const saveProgress = async () => {
-    try {
-      await deleteData(`progress_${user?.id}_${"easy"}`);
-      await saveData(`progress_${user?.id}_${"easy"}`, {
-        currentQuestionIndex,
-        score,
-      });
-    } catch (error) {
-      console.error("Failed to save progress:", error);
-    }
-  };
 
   const handleOptionPress = (option: any) => {
     setSelectedOption(option);
@@ -63,40 +40,30 @@ const PhysicsQuestion = () => {
     if (currentQuestionIndex < filteredQuestions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedOption(null);
-      await saveProgress();
     } else {
       await saveQuizResult();
-      Alert.alert(
-        "Challenge Completed",
-        `You scored ${
-          score +
-          (selectedOption === filteredQuestions[currentQuestionIndex].options
-            ? 1
-            : 0)
-        } out of ${filteredQuestions.length * 5}`
-      );
+      setShowModal(true);
+      setTimeout(() => {
+        router.replace("/home");
+      }, 3000);
     }
   };
 
   const saveQuizResult = async () => {
     try {
       const quizResults = (await getData("quiz_results")) || [];
+      const finalScore = ((score / filteredQuestions.length) * 100).toFixed(2);
       const newResult = {
-        id: quizResults.length + 1,
+        id: user?.id,
         userId: user?.id,
-        score:
-          score +
-          (selectedOption === filteredQuestions[currentQuestionIndex].options
-            ? 1
-            : 0),
+        score: finalScore,
+        xp: score * 10,
         timestamp: new Date().toISOString(),
         level: "easy",
       };
       quizResults.push(newResult);
       await saveData("quiz_results", quizResults);
-      await saveData(`progress_${user?.id}_${"easy"}`, null);
 
-      // Update overall progress
       const overallProgress = (await getData(
         `overall_progress_${user?.id}`
       )) || {
@@ -105,7 +72,7 @@ const PhysicsQuestion = () => {
         points: 0,
       };
       overallProgress.quizzesCompleted += 1;
-      overallProgress.points += score;
+      overallProgress.points += score * 10; // Correctly add points
       overallProgress.totalQuizzes = questions.length;
       await saveData(`overall_progress_${user?.id}`, overallProgress);
     } catch (error) {
@@ -115,15 +82,16 @@ const PhysicsQuestion = () => {
   };
 
   return (
-    <View className="flex-1 min-h-[85vh] w-full justify-center">
+    <View className="w-full">
       <Text className="font-psemibold text-2xl text-white mb-5">
-        Question {currentQuestionIndex + 1}
+        {subject.toUpperCase()}
       </Text>
       <Text className="font-psemibold text-2xl text-white mb-5">
-        {filteredQuestions[currentQuestionIndex].question}
+        {`${currentQuestionIndex + 1}. `}
+        {filteredQuestions[currentQuestionIndex]?.question}
       </Text>
       <FlatList
-        data={filteredQuestions[currentQuestionIndex].options}
+        data={filteredQuestions[currentQuestionIndex]?.options}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item, index }) => (
           <TouchableOpacity
@@ -144,38 +112,25 @@ const PhysicsQuestion = () => {
         }
         handlePress={handleNextQuestion}
         disabled={!selectedOption}
-        containerStyles={`w-full text-white ${
+        containerStyles={`w-full text-white mt-8 ${
           !selectedOption && "bg-gray-100"
         }`}
       />
+      {showModal && (
+        <CMessageModal
+          visible={showModal}
+          title={`Challenge Completed`}
+          message={`
+        You scored ${((score / filteredQuestions?.length) * 100).toFixed(
+          2
+        )} out of 100`}
+          onClose={() => setShowModal(!showModal)}
+          className="rounded-lg"
+          type={`success`}
+        />
+      )}
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "bg-primary",
-  },
-  question: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  option: {
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  selectedOption: {
-    backgroundColor: "#d3d3d3",
-  },
-  optionText: {
-    fontSize: 18,
-  },
-});
-
-export default PhysicsQuestion;
+export default Question;

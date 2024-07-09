@@ -169,6 +169,7 @@ const RegisterComponent = () => {
               title={`${loading ? "Please wait..." : "Register"}`}
               handlePress={handleSubmit}
               containerStyles="mt-5"
+              disabled={false}
             />
             <View className="justify-center pt-5 flex-row gap-2">
               <Text className="text-lg font-pregular text-gray-100">

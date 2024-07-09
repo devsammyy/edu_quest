@@ -1,6 +1,6 @@
 import { View, Text, FlatList } from "react-native";
 import React, { useEffect, useState } from "react";
-import QuestionCard from "./single-card";
+import QuestionCard from "./components/single-card";
 import { icons } from "@/constants";
 import { getAllofQuestions } from "@/modules/question/service";
 
@@ -38,9 +38,13 @@ const ChallengeComponent = () => {
     <FlatList
       data={question}
       keyExtractor={(item: any) => item.id.toString()}
+      centerContent
+      contentContainerStyle={{
+        alignItems: "center",
+      }}
       renderItem={({ item }) => (
-        <View className=" px-1">
-          <View>
+        <View className="">
+          <View className="items-center">
             {question.length > 0 && (
               <QuestionCard name={item.name} icon={mapIcon(item.name)} />
             )}

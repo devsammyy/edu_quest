@@ -70,6 +70,7 @@ const TabLayout = () => {
           options={{
             title: "Settings",
             headerShown: false,
+
             tabBarIcon: ({ color, focused }) => (
               <TabIcon
                 color={color}

@@ -1,20 +1,13 @@
-import {
-  View,
-  Text,
-  Image,
-  ImageSourcePropType,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, Image, ImageSourcePropType } from "react-native";
 import React from "react";
 import { icons } from "@/constants";
 
 interface IProps {
   title: string;
   value: string | undefined;
-  icon: ImageSourcePropType | undefined;
 }
 
-const Tile: React.FC<IProps> = ({ title, value, icon }) => {
+const Tile: React.FC<IProps> = ({ title, value }) => {
   const mapIcon = () => {
     switch (title) {
       case "Name":
@@ -28,8 +21,8 @@ const Tile: React.FC<IProps> = ({ title, value, icon }) => {
       case "Email":
         return icons.envelope;
 
-      case "Password":
-        return icons.padlock;
+      case "Logout":
+        return icons.logout;
 
       default:
     }
@@ -44,13 +37,13 @@ const Tile: React.FC<IProps> = ({ title, value, icon }) => {
           className="w-5 h-5"
         />
         <View>
-          <Text className="text-white font-psemibold text-md">{title}</Text>
-          <Text className="text-white font-pregular text-xs">{value}</Text>
+          <Text className="text-white font-psemibold text-lg">{title}</Text>
+          <Text className="text-white font-pregular text-md">{value}</Text>
         </View>
       </View>
-      <TouchableOpacity>
+      {/* <TouchableOpacity>
         <Text className="font-psemibold text-md text-main">Edit</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 };

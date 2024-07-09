@@ -1,12 +1,15 @@
-import { SplashScreen, Stack } from "expo-router";
+import { router, SplashScreen, Stack } from "expo-router";
 import { useFonts } from "expo-font";
 import "nativewind";
 import { useEffect } from "react";
 import { ContextProvider } from "@/context";
+import { useUserState } from "@/modules/auth/context";
+import * as SecureStore from "expo-secure-store";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  const { user } = useUserState();
   const [fontsLoaded, error] = useFonts({
     "Poppins-Black": require("../assets/fonts/Poppins-Black.ttf"),
     "Poppins-Bold": require("../assets/fonts/Poppins-Bold.ttf"),
@@ -21,7 +24,6 @@ export default function RootLayout() {
     if (error) throw error;
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded, error]);
-
   if (!fontsLoaded && !error) return null;
 
   return (

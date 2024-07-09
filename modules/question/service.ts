@@ -1,4 +1,4 @@
-import { IAllQuestions, IQuestion } from "./model";
+import { IQuestion } from "./model";
 import { english, physics, chemistry, englisMispellet } from "./questions";
 
 export const getSingleQuestionsByName = async (

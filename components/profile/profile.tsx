@@ -9,7 +9,7 @@ import Badge from "./components/badges";
 const Profile = () => {
   const { user } = useUserState();
   return (
-    <View className="flex-col my-20 items-center justify-center">
+    <View className="flex-col mt-12 items-center justify-center">
       <TouchableOpacity>
         <Image
           source={icons.profile}
@@ -20,7 +20,7 @@ const Profile = () => {
       <Text className="font-psemibold mt-3 text-2xl text-white">
         {user?.fullName}
       </Text>
-      <Text className="font-psemibold text-white">{user?.username}</Text>
+      <Text className="font-psemibold text-white">@{user?.username}</Text>
       <CSegment
         containerClassName="w-full rounded-lg my-5"
         items={[

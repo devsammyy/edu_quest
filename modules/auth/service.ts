@@ -46,7 +46,7 @@ export const createUser = async (
     }
 
     const newUserId = Date.now().toString(); // Generate unique ID
-    const newUser: IUser = { ...userData, id: newUserId };
+    const newUser: IUser = { ...userData, id: newUserId, setupCompleted: true };
 
     const updatedUsers = [...users, newUser];
 
