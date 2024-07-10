@@ -37,8 +37,8 @@ const Tile: React.FC<IProps> = ({ title, value }) => {
           className="w-5 h-5"
         />
         <View>
-          <Text className="text-white font-psemibold text-lg">{title}</Text>
-          <Text className="text-white font-pregular text-md">{value}</Text>
+          <Text className="text-white font-psemibold text-md">{title}</Text>
+          <Text className="text-white font-pregular text-sm">{value}</Text>
         </View>
       </View>
       {/* <TouchableOpacity>

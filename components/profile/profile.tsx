@@ -30,7 +30,7 @@ const Profile = () => {
             children: () => <General />,
           },
           {
-            label: "Badges",
+            label: "Achievements",
             key: "2",
             children: () => <Badge />,
           },

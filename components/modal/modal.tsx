@@ -1,4 +1,5 @@
 import { BlurView } from "expo-blur";
+import LottieView from "lottie-react-native";
 import React, { useEffect, useRef } from "react";
 import {
   Modal,
@@ -95,14 +96,25 @@ const CMessageModal: React.FC<ICMessage> = ({
               >
                 <Text className="font-psemibold text-xl text-white">x</Text>
               </TouchableOpacity>
-              <Text className="mb-4 text-white text-md font-pbold">
-                {message}!
-              </Text>
+              <Text className="text-white text-md font-pbold">{message}!</Text>
               {type === "success" && (
-                <Icon name="check-circle" size={100} color="green" />
+                <LottieView
+                  source={require("@/assets/animations/success.json")}
+                  autoPlay
+                  loop
+                  style={{ width: 200, height: 200 }}
+                />
               )}
-              {type === "error" && <Icon name="error" size={100} color="red" />}
-              <Text className="text-white mt-4 font-psemibold">
+              {type === "error" && (
+                <LottieView
+                  source={require("@/assets/animations/error.json")}
+                  autoPlay
+                  loop
+                  // speed={0.8}
+                  style={{ width: 200, height: 200 }}
+                />
+              )}
+              <Text className="text-white mt-2 font-psemibold">
                 {additionalMessage}
               </Text>
             </Animated.View>

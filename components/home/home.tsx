@@ -26,35 +26,28 @@ const Home = () => {
           <View>
             <View className="pt-2 flex-1 justify-between flex-row w-full">
               <Text className="text-gray-100 text-lg font-psemibold mb-3">
-                Quiz Zone
+                Daily Challenges
               </Text>
-              <TouchableOpacity onPress={() => router.push("/challenge")}>
-                <Text className="text-gray-400 text-md font-psemibold mb-3">
-                  View all
+            </View>
+            <TouchableOpacity onPress={() => router.push("/challenge")}>
+              <View className="bg-slate-800 h-[150px] my-5 flex-row rounded-lg p-4 items-center justify-center">
+                <Text className="font-pmedium text-md text-white">
+                  Today's challenge: Complete 5 quizzes!
                 </Text>
-              </TouchableOpacity>
-            </View>
-            <View className="bg-slate-800 h-[150px] mb-5 flex-row rounded-lg p-4 items-center justify-center">
-              <Text className="font-pmedium text-md text-white">
-                Almost Ready! Click view all
-              </Text>
-            </View>
-          </View>
-          <View className="pt-2 flex-1 justify-between flex-row w-full">
-            <Text className="text-gray-100 text-lg font-psemibold mb-3">
-              Contest
-            </Text>
-            <TouchableOpacity>
-              <Text className="text-gray-400 text-md font-psemibold mb-3">
-                View all
-              </Text>
+              </View>
             </TouchableOpacity>
           </View>
-          <View className="bg-slate-800 h-[150px] mb-5 flex-row rounded-lg p-4 items-center justify-center">
-            <Text className="font-pmedium text-md text-white">
-              Coming soon!
-            </Text>
-          </View>
+          <Text className="text-gray-100 text-lg font-psemibold mb-3">
+            Practice Quizzes
+          </Text>
+          <TouchableOpacity onPress={() => router.push("/challenge")}>
+            <View className="pt-2 flex-1 justify-between flex-row w-full"></View>
+            <View className="bg-slate-800 h-[150px] mb-5 flex-row rounded-lg p-4 items-center justify-center">
+              <Text className="font-pmedium text-md text-white">
+                Improve your knowlegde with practice quizzes!
+              </Text>
+            </View>
+          </TouchableOpacity>
         </>
       )}
       ListEmptyComponent={() => (

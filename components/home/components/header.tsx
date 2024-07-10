@@ -4,10 +4,12 @@ import { icons } from "@/constants";
 import DisplayCard from "./display-card";
 import { useUserState } from "@/modules/auth/context";
 import { getData } from "@/modules/challenge/service";
+import { LinearGradient } from "expo-linear-gradient";
 
 const Header = () => {
   const { user } = useUserState();
   const [xp, setXp] = useState(0);
+  const [completed, setCompleted] = useState(0);
 
   useEffect(() => {
     const fetchXP = async () => {
@@ -16,8 +18,9 @@ const Header = () => {
         console.log(overallProgress);
         if (overallProgress) {
           const parsedProgress = overallProgress;
-          const { points } = parsedProgress;
-          setXp(Number(points)); // Ensure points are a number
+          const { points, quizzesCompleted } = parsedProgress;
+          setXp(Number(points));
+          setCompleted(Number(quizzesCompleted));
         }
       } catch (error) {
         console.error("Failed to load XP:", error);
@@ -61,17 +64,21 @@ const Header = () => {
           />
         </TouchableOpacity>
       </View>
-
-      <View className="flex-1 p-5 bg-main justify-center  rounded-lg mb-5">
+      <LinearGradient
+        colors={["#ffa001", "#1E293B"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        className="mb-3 w-full flex-1 justify-center  rounded-lg  p-5 bg-gradient-to-tr from-[#ffa001] to-[#1E293B] "
+      >
         <View className="flex-row p-4 items-center justify-center">
-          <DisplayCard name="Rank" value="20" />
+          <DisplayCard name="Level" value="1" />
           <View className="w-[2px] rounded-md h-full bg-slate-200" />
 
-          <DisplayCard name="Coins" value="10" />
+          <DisplayCard name="Completed" value={completed.toString()} />
           <View className="w-[2px] rounded-md h-full bg-slate-200" />
           <DisplayCard name="Score" value={xp.toString()} />
         </View>
-      </View>
+      </LinearGradient>
     </View>
   );
 };

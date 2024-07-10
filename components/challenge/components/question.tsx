@@ -3,41 +3,76 @@ import CMessageModal from "@/components/modal/modal";
 import { useUserState } from "@/modules/auth/context";
 import { getData, saveData } from "@/modules/challenge/service";
 import { useQuestionState } from "@/modules/question/context";
+import { IQuestion } from "@/modules/question/model";
 import { router } from "expo-router";
 import React, { useState, useEffect } from "react";
 import { View, Text, FlatList, TouchableOpacity, Alert } from "react-native";
+import LottieView from "lottie-react-native";
 
 interface IProps {
   subject: string | any;
-  difficulty: string | string[] | undefined;
+  difficulty: string | undefined;
 }
+
+// Function to shuffle an array
+const shuffleArray = (array: any[]) => {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+};
 
 const Question: React.FC<IProps> = ({ subject, difficulty }) => {
   const { user } = useUserState();
-  const { questions, getQuestions } = useQuestionState();
+  const { questions, loading, getQuestions } = useQuestionState();
+  const [shuffledQuestions, setShuffledQuestions] = useState<IQuestion[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
-  const [selectedOption, setSelectedOption] = useState(null);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const filteredQuestions = questions.filter(
-    (q) => q.difficulty === difficulty
-  );
   const optionLabels = ["A", "B", "C", "D"];
 
   useEffect(() => {
-    getQuestions(subject);
-  }, []);
+    const fetchAndShuffleQuestions = async () => {
+      await getQuestions(subject);
+    };
 
-  const handleOptionPress = (option: any) => {
+    fetchAndShuffleQuestions();
+  }, [subject]);
+
+  useEffect(() => {
+    console.log("Questions state updated:", questions);
+    if (questions.length > 0) {
+      const filteredQuestions = questions.filter(
+        (q) => q.difficulty === difficulty
+      );
+
+      // Shuffle the questions
+      const shuffled = shuffleArray([...filteredQuestions]);
+
+      // Shuffle the options of each question
+      const shuffledQuestionsWithShuffledOptions = shuffled.map((question) => ({
+        ...question,
+        options: shuffleArray([...question.options]),
+      }));
+
+      setShuffledQuestions(shuffledQuestionsWithShuffledOptions);
+    } else {
+      console.log("No questions available or fetching failed.");
+    }
+  }, [questions, difficulty]);
+
+  const handleOptionPress = (option: string) => {
     setSelectedOption(option);
   };
 
   const handleNextQuestion = async () => {
-    if (selectedOption === filteredQuestions[currentQuestionIndex].answer) {
+    if (selectedOption === shuffledQuestions[currentQuestionIndex].answer) {
       setScore(score + 1);
     }
 
-    if (currentQuestionIndex < filteredQuestions.length - 1) {
+    if (currentQuestionIndex < shuffledQuestions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedOption(null);
     } else {
@@ -52,7 +87,7 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
   const saveQuizResult = async () => {
     try {
       const quizResults = (await getData("quiz_results")) || [];
-      const finalScore = ((score / filteredQuestions.length) * 100).toFixed(2);
+      const finalScore = ((score / shuffledQuestions.length) * 100).toFixed(2);
       const newResult = {
         id: user?.id,
         userId: user?.id,
@@ -73,13 +108,28 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
       };
       overallProgress.quizzesCompleted += 1;
       overallProgress.points += score * 10; // Correctly add points
-      overallProgress.totalQuizzes = questions.length;
+      overallProgress.totalQuizzes = shuffledQuestions.length;
       await saveData(`overall_progress_${user?.id}`, overallProgress);
     } catch (error) {
       console.error("Failed to save quiz result:", error);
       Alert.alert("Error", "Failed to save quiz result.");
     }
   };
+  if (loading || shuffledQuestions.length === 0) {
+    return (
+      <View className="w-full flex-1 justify-center items-center">
+        <LottieView
+          source={require("@/assets/animations/loader.json")}
+          autoPlay
+          loop
+          style={{ width: 200, height: 200 }}
+        />
+        <Text className="font-psemibold text-2xl text-white mt-5">
+          Loading questions...
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View className="w-full">
@@ -88,10 +138,10 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
       </Text>
       <Text className="font-psemibold text-2xl text-white mb-5">
         {`${currentQuestionIndex + 1}. `}
-        {filteredQuestions[currentQuestionIndex]?.question}
+        {shuffledQuestions[currentQuestionIndex]?.question}
       </Text>
       <FlatList
-        data={filteredQuestions[currentQuestionIndex]?.options}
+        data={shuffledQuestions[currentQuestionIndex]?.options}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item, index }) => (
           <TouchableOpacity
@@ -106,7 +156,7 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
       />
       <CustomButton
         title={
-          currentQuestionIndex < filteredQuestions.length - 1
+          currentQuestionIndex < shuffledQuestions.length - 1
             ? "Next Question"
             : "Finish Quiz"
         }
@@ -121,7 +171,7 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
           visible={showModal}
           title={`Challenge Completed`}
           message={`
-        You scored ${((score / filteredQuestions?.length) * 100).toFixed(
+        You scored ${((score / shuffledQuestions?.length) * 100).toFixed(
           2
         )} out of 100`}
           onClose={() => setShowModal(!showModal)}

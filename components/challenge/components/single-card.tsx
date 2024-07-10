@@ -108,7 +108,7 @@ const QuestionCard: React.FC<IProps> = ({ name, icon }) => {
                 },
               ]}
             >
-              <Text className="text-white font-psemibold text-xl">
+              <Text className="text-white font-psemibold my-5 text-xl">
                 Select Difficulty
               </Text>
               {["easy", "medium", "hard"].map((level) => (
@@ -117,7 +117,7 @@ const QuestionCard: React.FC<IProps> = ({ name, icon }) => {
                   colors={["#ffa001", "#1E293B"]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
-                  className="my-1 rounded-xl w-full  min-h-[62px] justify-center items-center"
+                  className="my-2 rounded-xl w-full  min-h-[62px] justify-center items-center"
                 >
                   <TouchableOpacity
                     onPress={() => handleDifficultySelect(level)}
