@@ -10,7 +10,8 @@ interface ICustomButton {
   title: string;
   handlePress?: any;
   disabled: boolean;
-  containerStyles: any;
+  containerStyles: string;
+  textColor?: string | undefined;
 }
 
 const CustomButton: React.FC<ICustomButton> = ({
@@ -18,6 +19,7 @@ const CustomButton: React.FC<ICustomButton> = ({
   handlePress,
   disabled,
   containerStyles,
+  textColor,
 }) => {
   return (
     <TouchableOpacity
@@ -26,7 +28,13 @@ const CustomButton: React.FC<ICustomButton> = ({
       disabled={disabled}
       className={` bg-main rounded-xl min-h-[62px] justify-center items-center ${containerStyles}`}
     >
-      <Text className="text-primary text-lg font-psemibold">{title}</Text>
+      <Text
+        className={`${
+          textColor ? textColor : "text-primary"
+        }  text-lg font-psemibold`}
+      >
+        {title}
+      </Text>
     </TouchableOpacity>
   );
 };

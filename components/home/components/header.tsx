@@ -74,7 +74,7 @@ const Header = () => {
           <DisplayCard name="Level" value="1" />
           <View className="w-[2px] rounded-md h-full bg-slate-200" />
 
-          <DisplayCard name="Completed" value={completed.toString()} />
+          <DisplayCard name="Attempted" value={completed.toString()} />
           <View className="w-[2px] rounded-md h-full bg-slate-200" />
           <DisplayCard name="Score" value={xp.toString()} />
         </View>

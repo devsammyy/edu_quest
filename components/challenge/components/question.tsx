@@ -29,7 +29,7 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
   const [shuffledQuestions, setShuffledQuestions] = useState<IQuestion[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [selectedOptions, setSelectedOptions] = useState<(string | null)[]>([]);
   const [showModal, setShowModal] = useState(false);
   const optionLabels = ["A", "B", "C", "D"];
 
@@ -42,7 +42,6 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
   }, [subject]);
 
   useEffect(() => {
-    console.log("Questions state updated:", questions);
     if (questions.length > 0) {
       const filteredQuestions = questions.filter(
         (q) => q.difficulty === difficulty
@@ -58,29 +57,42 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
       }));
 
       setShuffledQuestions(shuffledQuestionsWithShuffledOptions);
+      setSelectedOptions(
+        Array(shuffledQuestionsWithShuffledOptions.length).fill(null)
+      );
     } else {
       console.log("No questions available or fetching failed.");
     }
   }, [questions, difficulty]);
 
   const handleOptionPress = (option: string) => {
-    setSelectedOption(option);
+    const newSelectedOptions = [...selectedOptions];
+    newSelectedOptions[currentQuestionIndex] = option;
+    setSelectedOptions(newSelectedOptions);
   };
 
   const handleNextQuestion = async () => {
-    if (selectedOption === shuffledQuestions[currentQuestionIndex].answer) {
+    if (
+      selectedOptions[currentQuestionIndex] ===
+      shuffledQuestions[currentQuestionIndex].answer
+    ) {
       setScore(score + 1);
     }
 
     if (currentQuestionIndex < shuffledQuestions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setSelectedOption(null);
     } else {
       await saveQuizResult();
       setShowModal(true);
       setTimeout(() => {
         router.replace("/home");
       }, 3000);
+    }
+  };
+
+  const handlePreviousQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
   };
 
@@ -115,6 +127,7 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
       Alert.alert("Error", "Failed to save quiz result.");
     }
   };
+
   if (loading || shuffledQuestions.length === 0) {
     return (
       <View className="w-full flex-1 justify-center items-center">
@@ -133,20 +146,28 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
 
   return (
     <View className="w-full">
-      <Text className="font-psemibold text-2xl text-white mb-5">
-        {subject.toUpperCase()}
-      </Text>
-      <Text className="font-psemibold text-2xl text-white mb-5">
-        {`${currentQuestionIndex + 1}. `}
-        {shuffledQuestions[currentQuestionIndex]?.question}
-      </Text>
+      <View className="mb-4 p-4 bg-slate-800 rounded-lg">
+        <View className="flex-row justify-between">
+          <Text className="font-psemibold text-xl text-white mb-5">
+            {subject.toUpperCase()}
+          </Text>
+          <Text className="font-psemibold text-xl text-white mb-5">
+            {difficulty?.toUpperCase()}
+          </Text>
+        </View>
+        <Text className="font-psemibold text-2xl text-white mb-5">
+          {`${currentQuestionIndex + 1}. `}
+          {shuffledQuestions[currentQuestionIndex]?.question}
+        </Text>
+      </View>
       <FlatList
         data={shuffledQuestions[currentQuestionIndex]?.options}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item, index }) => (
           <TouchableOpacity
-            className={`px-4 py-2 ${
-              item === selectedOption && "bg-main rounded-lg"
+            className={`px-4 border-[1px] border-main mb-2 py-3 rounded-lg ${
+              item === selectedOptions[currentQuestionIndex] &&
+              "bg-main rounded-lg"
             }`}
             onPress={() => handleOptionPress(item)}
           >
@@ -154,18 +175,30 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
           </TouchableOpacity>
         )}
       />
-      <CustomButton
-        title={
-          currentQuestionIndex < shuffledQuestions.length - 1
-            ? "Next Question"
-            : "Finish Quiz"
-        }
-        handlePress={handleNextQuestion}
-        disabled={!selectedOption}
-        containerStyles={`w-full text-white mt-8 ${
-          !selectedOption && "bg-gray-100"
-        }`}
-      />
+      <View className="flex-row justify-between mt-8">
+        <CustomButton
+          title="Previous"
+          handlePress={handlePreviousQuestion}
+          disabled={currentQuestionIndex === 0}
+          containerStyles={`w-1/2 text-white mr-2 ${
+            currentQuestionIndex === 0 && "bg-slate-800 mr-3 p-[-10px]"
+          }`}
+          textColor="text-white"
+        />
+        <CustomButton
+          title={
+            currentQuestionIndex < shuffledQuestions.length - 1
+              ? "Next "
+              : "Finish Quiz"
+          }
+          handlePress={handleNextQuestion}
+          disabled={!selectedOptions[currentQuestionIndex]}
+          containerStyles={`w-1/2 text-white  ${
+            !selectedOptions[currentQuestionIndex] && "bg-slate-800"
+          }`}
+          textColor="text-white"
+        />
+      </View>
       {showModal && (
         <CMessageModal
           visible={showModal}

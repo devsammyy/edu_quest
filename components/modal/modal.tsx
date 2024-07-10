@@ -98,22 +98,9 @@ const CMessageModal: React.FC<ICMessage> = ({
               </TouchableOpacity>
               <Text className="text-white text-md font-pbold">{message}!</Text>
               {type === "success" && (
-                <LottieView
-                  source={require("@/assets/animations/success.json")}
-                  autoPlay
-                  loop
-                  style={{ width: 200, height: 200 }}
-                />
+                <Icon name="check-circle" size={100} color="green" />
               )}
-              {type === "error" && (
-                <LottieView
-                  source={require("@/assets/animations/error.json")}
-                  autoPlay
-                  loop
-                  // speed={0.8}
-                  style={{ width: 200, height: 200 }}
-                />
-              )}
+              {type === "error" && <Icon name="error" size={100} color="red" />}
               <Text className="text-white mt-2 font-psemibold">
                 {additionalMessage}
               </Text>
