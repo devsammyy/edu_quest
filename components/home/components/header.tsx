@@ -10,24 +10,38 @@ const Header = () => {
   const { user } = useUserState();
   const [xp, setXp] = useState(0);
   const [completed, setCompleted] = useState(0);
+  const [highScore, setHighScore] = useState(0);
+  const [level, setLevel] = useState("Beginner");
+  const [streak, setStreak] = useState(0);
 
   useEffect(() => {
-    const fetchXP = async () => {
+    const fetchUserProgress = async () => {
       try {
         const overallProgress = await getData(`overall_progress_${user?.id}`);
         console.log(overallProgress);
         if (overallProgress) {
-          const parsedProgress = overallProgress;
-          const { points, quizzesCompleted } = parsedProgress;
+          const { points, quizzesCompleted, highScore, streak } =
+            overallProgress;
           setXp(Number(points));
           setCompleted(Number(quizzesCompleted));
+          setHighScore(Number(highScore));
+          setStreak(Number(streak));
+
+          // Determine level based on points
+          if (points >= 200) {
+            setLevel("Advanced Scholar");
+          } else if (points >= 100) {
+            setLevel("Intermediate Scholar");
+          } else {
+            setLevel("Beginner");
+          }
         }
       } catch (error) {
-        console.error("Failed to load XP:", error);
+        console.error("Failed to load user progress:", error);
       }
     };
 
-    fetchXP();
+    fetchUserProgress();
   }, [user]);
 
   return (
@@ -55,7 +69,7 @@ const Header = () => {
             </View>
           </View>
         </View>
-        <TouchableOpacity className=" flex-col items-center justify-center p-3 rounded-lg">
+        <TouchableOpacity className="flex-col items-center justify-center p-3 rounded-lg">
           <Image
             source={icons.winning}
             className="w-6 h-6"
@@ -68,15 +82,18 @@ const Header = () => {
         colors={["#ffa001", "#1E293B"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        className="mb-3 w-full flex-1 justify-center  rounded-lg  p-5 bg-gradient-to-tr from-[#ffa001] to-[#1E293B] "
+        className="mb-3 w-full flex-1 justify-center rounded-lg p-5 bg-gradient-to-tr from-[#ffa001] to-[#1E293B]"
       >
         <View className="flex-row p-4 items-center justify-center">
-          <DisplayCard name="Level" value="1" />
+          <DisplayCard name="Level" value={level} />
           <View className="w-[2px] rounded-md h-full bg-slate-200" />
-
           <DisplayCard name="Attempted" value={completed.toString()} />
           <View className="w-[2px] rounded-md h-full bg-slate-200" />
           <DisplayCard name="Score" value={xp.toString()} />
+          <View className="w-[2px] rounded-md h-full bg-slate-200" />
+          <DisplayCard name="High Score" value={highScore.toString()} />
+          <View className="w-[2px] rounded-md h-full bg-slate-200" />
+          <DisplayCard name="Streak" value={streak.toString()} />
         </View>
       </LinearGradient>
     </View>

@@ -31,6 +31,7 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
   const [score, setScore] = useState(0);
   const [selectedOptions, setSelectedOptions] = useState<(string | null)[]>([]);
   const [showModal, setShowModal] = useState(false);
+  const [streak, setStreak] = useState(0);
   const optionLabels = ["A", "B", "C", "D"];
 
   useEffect(() => {
@@ -46,11 +47,7 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
       const filteredQuestions = questions.filter(
         (q) => q.difficulty === difficulty
       );
-
-      // Shuffle the questions
       const shuffled = shuffleArray([...filteredQuestions]);
-
-      // Shuffle the options of each question
       const shuffledQuestionsWithShuffledOptions = shuffled.map((question) => ({
         ...question,
         options: shuffleArray([...question.options]),
@@ -77,6 +74,9 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
       shuffledQuestions[currentQuestionIndex].answer
     ) {
       setScore(score + 1);
+      setStreak(streak + 1);
+    } else {
+      setStreak(0);
     }
 
     if (currentQuestionIndex < shuffledQuestions.length - 1) {
@@ -104,9 +104,10 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
         id: user?.id,
         userId: user?.id,
         score: finalScore,
-        xp: score * 10,
+        xp: score,
         timestamp: new Date().toISOString(),
-        level: "easy",
+        level: finalScore === "100.00" ? "Upgraded" : "easy",
+        streakReward: streak >= 5 ? "Streak Bonus" : "",
       };
       quizResults.push(newResult);
       await saveData("quiz_results", quizResults);
@@ -118,8 +119,18 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
         quizzesCompleted: 0,
         points: 0,
       };
+
+      if (finalScore === "100.00") {
+        overallProgress.level = "Upgraded";
+      }
+
+      if (streak >= 5) {
+        overallProgress.streakBonus = true;
+        overallProgress.points += 50; // Bonus points for streak
+      }
+
       overallProgress.quizzesCompleted += 1;
-      overallProgress.points += score * 10; // Correctly add points
+      overallProgress.points += score; // Correctly add points
       overallProgress.totalQuizzes = shuffledQuestions.length;
       await saveData(`overall_progress_${user?.id}`, overallProgress);
     } catch (error) {
@@ -148,14 +159,15 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
     <View className="w-full">
       <View className="mb-4 p-4 bg-slate-800 rounded-lg">
         <View className="flex-row justify-between">
-          <Text className="font-psemibold text-xl text-white mb-5">
-            {subject.toUpperCase()}
+          <Text className="font-psemibold text-md text-white mb-5">
+            Subject: {subject.charAt(0).toUpperCase() + subject.slice(1)}
           </Text>
-          <Text className="font-psemibold text-xl text-white mb-5">
-            {difficulty?.toUpperCase()}
+          <Text className="font-psemibold text-md text-white mb-5">
+            Difficulty:{" "}
+            {difficulty!.charAt(0).toUpperCase() + difficulty?.slice(1)}
           </Text>
         </View>
-        <Text className="font-psemibold text-2xl text-white mb-5">
+        <Text className="font-psemibold text-xl text-white mb-5">
           {`${currentQuestionIndex + 1}. `}
           {shuffledQuestions[currentQuestionIndex]?.question}
         </Text>
@@ -171,7 +183,7 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
             }`}
             onPress={() => handleOptionPress(item)}
           >
-            <Text className="text-white font-pmedium text-lg">{`${optionLabels[index]}. ${item}`}</Text>
+            <Text className="text-white font-pmedium text-md">{`${optionLabels[index]}. ${item}`}</Text>
           </TouchableOpacity>
         )}
       />
@@ -206,7 +218,8 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
           message={`
         You scored ${((score / shuffledQuestions?.length) * 100).toFixed(
           2
-        )} out of 100`}
+        )} out of 100. ${streak >= 5 ? "You earned a streak bonus!" : ""}
+        ${score === 100.0 ? "Level Up!" : ""}`}
           onClose={() => setShowModal(!showModal)}
           className="rounded-lg"
           type={`success`}

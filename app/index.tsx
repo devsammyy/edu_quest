@@ -54,8 +54,8 @@ const LandingPage = () => {
           </View>
 
           <CustomButton
-            title="Continue"
-            handlePress={handleNavigate}
+            title="Proceed"
+            handlePress={() => handleNavigate()}
             containerStyles="w-full mt-7"
             disabled={false}
           />
