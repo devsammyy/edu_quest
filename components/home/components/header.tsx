@@ -1,4 +1,11 @@
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  Alert,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { icons } from "@/constants";
 import DisplayCard from "./display-card";
@@ -13,6 +20,30 @@ const Header = () => {
   const [highScore, setHighScore] = useState(0);
   const [level, setLevel] = useState("Beginner");
   const [streak, setStreak] = useState(0);
+  const [shownNotifications, setShownNotifications] = useState({
+    completed: false,
+    streak: false,
+    level: false,
+  });
+
+  useEffect(() => {
+    if (completed >= 10 && !shownNotifications.completed) {
+      Alert.alert("Congratulations!", "You have attempted 10 quizzes!");
+      setShownNotifications((prev) => ({ ...prev, completed: true }));
+    }
+
+    if (streak >= 5 && !shownNotifications.streak) {
+      Alert.alert("Great Job!", "You have a streak of 5 correct answers!");
+      setShownNotifications((prev) => ({ ...prev, streak: true }));
+    }
+
+    if (level === "Advanced Scholar" && !shownNotifications.level) {
+      Alert.alert("Level Up", "You have reached Advanced Scholar level!");
+      setShownNotifications((prev) => ({ ...prev, level: true }));
+    }
+
+    // Add more conditions as needed
+  }, [completed, streak, level, shownNotifications]);
 
   useEffect(() => {
     const fetchUserProgress = async () => {
@@ -84,17 +115,19 @@ const Header = () => {
         end={{ x: 1, y: 1 }}
         className="mb-3 w-full flex-1 justify-center rounded-lg p-5 bg-gradient-to-tr from-[#ffa001] to-[#1E293B]"
       >
-        <View className="flex-row p-4 items-center justify-center">
-          <DisplayCard name="Level" value={level} />
-          <View className="w-[2px] rounded-md h-full bg-slate-200" />
-          <DisplayCard name="Attempted" value={completed.toString()} />
-          <View className="w-[2px] rounded-md h-full bg-slate-200" />
-          <DisplayCard name="Score" value={xp.toString()} />
-          <View className="w-[2px] rounded-md h-full bg-slate-200" />
-          <DisplayCard name="High Score" value={highScore.toString()} />
-          <View className="w-[2px] rounded-md h-full bg-slate-200" />
-          <DisplayCard name="Streak" value={streak.toString()} />
-        </View>
+        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+          <View className="flex-row p-4 items-center justify-center">
+            <DisplayCard name="Level" value={level} />
+            <View className="w-[2px] rounded-md h-full bg-slate-200" />
+            <DisplayCard name="Attempted" value={completed.toString()} />
+            <View className="w-[2px] rounded-md h-full bg-slate-200" />
+            <DisplayCard name="Score" value={xp.toString()} />
+            <View className="w-[2px] rounded-md h-full bg-slate-200" />
+            <DisplayCard name="High Score" value={highScore.toString()} />
+            <View className="w-[2px] rounded-md h-full bg-slate-200" />
+            <DisplayCard name="Streak" value={streak.toString()} />
+          </View>
+        </ScrollView>
       </LinearGradient>
     </View>
   );

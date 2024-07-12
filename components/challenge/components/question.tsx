@@ -75,6 +75,9 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
     ) {
       setScore(score + 1);
       setStreak(streak + 1);
+      if (streak === 5) {
+        setShowModal(true);
+      }
     } else {
       setStreak(0);
     }
