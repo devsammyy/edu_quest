@@ -8,6 +8,7 @@ import CustomButton from "@/components/button/custom_btn";
 import CTextInput from "@/components/inputs/text_input";
 import { useUserState } from "@/modules/auth/context";
 import CMessageModal from "../modal/modal";
+import { router } from "expo-router";
 
 const ChangeSchema = Yup.object().shape({
   email: Yup.string().email().required("Please enter a valid email address"),
@@ -26,7 +27,12 @@ const ChangePasswordScreen = () => {
 
   const handleSubmission = (values: any) => {
     
-    updateUser(values)
+    updateUser(values).then((_)=>{
+      setShowModal(true)
+      setTimeout(()=>{
+        router.replace("login")
+      },2000)
+    })
   };
 
   return (

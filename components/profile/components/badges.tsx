@@ -3,8 +3,8 @@ import React from "react";
 
 const Badge = () => {
   return (
-    <View>
-      <Text>Badge</Text>
+    <View className="flex-col h-[50vh]  justify-center items-center">
+      <Text className="text-white font-pmedium ">No Achievement yet!</Text>
     </View>
   );
 };

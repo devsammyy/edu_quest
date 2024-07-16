@@ -35,19 +35,16 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
   const optionLabels = ["A", "B", "C", "D"];
 
   useEffect(() => {
-    console.log("Fetching questions for subject:", subject);
+    
     const fetchAndShuffleQuestions = async () => {
       await getQuestions(subject);
     };
     
     fetchAndShuffleQuestions();
-    console.log(questions)
+    
   }, [subject]);
   
   useEffect(() => {
-    
-    
-    console.log(subject)
     if (questions.length > 0) {
       const filteredQuestions = questions.filter(
         (q) => q.difficulty === difficulty
