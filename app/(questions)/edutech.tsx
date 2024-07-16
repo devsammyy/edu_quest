@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Question from "@/components/challenge/components/question";
 import { useLocalSearchParams } from "expo-router";
 
-const Mispelled = () => {
+const Edutech = () => {
   const { difficulty, name } = useLocalSearchParams();
   console.log(difficulty, name);
   return (
@@ -16,4 +16,4 @@ const Mispelled = () => {
   );
 };
 
-export default Mispelled;
+export default Edutech;

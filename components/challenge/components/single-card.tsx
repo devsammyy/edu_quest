@@ -66,7 +66,15 @@ const QuestionCard: React.FC<IProps> = ({ name, icon }) => {
             resizeMode="contain"
           />
           <Text className=" text-white text-lg mt-3 font-psemibold">
-            {name === "Mispelled" ? "Mispelled Words" : name}
+            {name === "Mispelled"
+              ? "Mispelled Words"
+              : name === "Edu"
+              ? "Education"
+              : name === "Maths"
+              ? "Mathematics"
+              : name === "Edutech"
+              ? "Educational Technology"
+              : name}
           </Text>
         </LinearGradient>
       </TouchableOpacity>

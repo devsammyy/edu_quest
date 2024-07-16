@@ -1,29 +1,33 @@
 import { IQuestion } from "./model";
-import { english, physics, chemistry, englisMispellet } from "./questions";
+import { english, physics, chemistry, englisMispellet, edu, maths, edutech } from "./questions";
 
 export const getSingleQuestionsByName = async (
-  name: "english" | "physics" | "chemistry" | "mispelled"
+  name: "english" | "physics" | "chemistry" | "mispelled" | "maths" | "edu" | "edutech"
 ) => {
-  try {
-    switch (name) {
+  
+     switch (name) {
       case "english":
         return english as IQuestion[];
-        break;
+        
       case "physics":
         return physics as IQuestion[];
-        break;
+        
       case "chemistry":
         return chemistry as IQuestion[];
-        break;
+        
       case "mispelled":
         return englisMispellet as IQuestion[];
+      case "edu":
+        return edu as IQuestion[];
+      case "maths":
+        return maths as IQuestion[];
+      case "edutech":
+        return edutech as IQuestion[];
       default:
         return [];
-        break;
+        
     }
-  } catch (error) {
-    throw new Error("Error retrieving questions");
-  }
+  
 };
 
 export const getAllofQuestions = async () => {
@@ -32,6 +36,9 @@ export const getAllofQuestions = async () => {
     { id: 2, name: "Physics", questions: physics },
     { id: 3, name: "Chemistry", questions: chemistry },
     { id: 4, name: "Mispelled", questions: englisMispellet },
+    { id: 5, name: "Maths", questions: maths },
+    { id: 6, name: "Edu", questions: edu },
+    { id: 7, name: "Edutech", questions: edutech },
   ];
 };
 

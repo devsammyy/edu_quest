@@ -11,18 +11,27 @@ const ChallengeComponent = () => {
     switch (icon) {
       case "English":
         return icons.vocabulary;
-        break;
+
       case "Physics":
         return icons.enzyme;
-        break;
+
       case "Chemistry":
         return icons.atom;
-        break;
+
       case "Mispelled":
         return icons.learn;
-        break;
+
+      case "Maths":
+        return icons.maths;
+
+      case "Education":
+        return icons.edu;
+
+      case "Edutech":
+        return icons.edutech;
+
       default:
-        break;
+        return icons.learn;
     }
   };
   const fetchAllQuestions = async () => {
@@ -40,11 +49,12 @@ const ChallengeComponent = () => {
       keyExtractor={(item: any) => item.id.toString()}
       centerContent
       contentContainerStyle={{
-        alignItems: "center",
+        marginHorizontal: "auto",
+        alignItems: "flex-start",
       }}
       renderItem={({ item }) => (
         <View className="">
-          <View className="items-center">
+          <View className="">
             {question.length > 0 && (
               <QuestionCard name={item.name} icon={mapIcon(item.name)} />
             )}
@@ -53,7 +63,7 @@ const ChallengeComponent = () => {
       )}
       numColumns={2}
       ListHeaderComponent={() => (
-        <Text className="font-psemibold text-white my-6 px-4 text-2xl">
+        <Text className="font-psemibold text-center text-white mt-8 mb-5 pl-20 text-2xl">
           All Categories
         </Text>
       )}

@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "quiz_app",
+    "name": "Edu Quest",
     "slug": "quiz_app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "scheme": "quizapp",
+    "scheme": "eduquest",
     "userInterfaceStyle": "automatic",
     "icon": "./assets/images/etLogo.png",
     "splash": {

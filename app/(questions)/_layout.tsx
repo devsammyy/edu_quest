@@ -31,6 +31,24 @@ const QuestionsLayout = () => {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="maths"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="edu"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="edutech"
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack>
       <StatusBar backgroundColor="#161622" style="dark" />
     </>

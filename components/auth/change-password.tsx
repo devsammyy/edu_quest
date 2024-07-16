@@ -6,22 +6,27 @@ import * as Yup from "yup";
 import { images } from "@/constants";
 import CustomButton from "@/components/button/custom_btn";
 import CTextInput from "@/components/inputs/text_input";
+import { useUserState } from "@/modules/auth/context";
+import CMessageModal from "../modal/modal";
 
 const ChangeSchema = Yup.object().shape({
+  email: Yup.string().email().required("Please enter a valid email address"),
   password: Yup.string()
     .min(4, "Password is too short")
-    .required("Email is required"),
+    .required("Password is required"),
   confirmPassword: Yup.string()
     .min(4, "Password is too short")
-    .required("Email is required"),
+    .required("Password is required"),
 });
 
 const ChangePasswordScreen = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const {updateUser, loading, fetchingState} = useUserState()
+  const [showModal, setShowModal] = useState(false)
+  const [isError, setIsError] = useState(false)
 
   const handleSubmission = (values: any) => {
-    console.log(values);
-    alert("Holla");
+    
+    updateUser(values)
   };
 
   return (
@@ -36,6 +41,7 @@ const ChangePasswordScreen = () => {
       </Text>
       <Formik
         initialValues={{
+          email: "",
           password: "",
           confirmPassword: "",
         }}
@@ -51,6 +57,22 @@ const ChangePasswordScreen = () => {
           touched,
         }: FormikProps<any>) => (
           <View>
+            <CTextInput
+              name="email"
+              title="Email address"
+              value={values.email}
+              placeholder="Enter your email address"
+              otherStyles="mt-3"
+              handler={handleChange("email")}
+              onBlur={handleBlur("email")}
+              onChangeText={handleChange("email")}
+            />
+            {errors.email && touched.email ? (
+              <Text className="text-red-500 font-psemibold">
+                <ErrorMessage name="email" />
+              </Text>
+            ) : null}
+
             <CTextInput
               name="password"
               title="New Password"
@@ -84,12 +106,27 @@ const ChangePasswordScreen = () => {
             ) : null}
 
             <CustomButton
-              title={`${isSubmitting ? "Please wait..." : "Change Password"}`}
+              title={`${loading ? "Please wait..." : "Change Password"}`}
               handlePress={handleSubmit}
               containerStyles="mt-3"
+              disabled={false}
             />
+        <CMessageModal
+          visible={showModal}
+          title={`${!isError ? "Success" : "Error!"}`}
+          message={`${!isError ? fetchingState : fetchingState}`}
+          additionalMessage={`${
+            !isError
+              ? "You will be redirected to the login page"
+              : ""
+          }`}
+          onClose={() => setShowModal(!showModal)}
+          className="rounded-lg"
+          type={`${!isError ? "success" : "error"}`}
+        />
           </View>
         )}
+
       </Formik>
     </View>
   );

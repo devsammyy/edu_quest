@@ -29,7 +29,7 @@ const LoginComponent = () => {
 
   const handleSubmission = async (values: IUser) => {
     try {
-      await login(values.username, values.password);
+      await login(values.username.trim(), values.password.trim());
       setStatus("Success");
       setShowModal(true);
       setTimeout(() => {

@@ -1,11 +1,12 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
 import SettingTile from "./setting-tile";
+import { router } from "expo-router";
 
 const SettingComponent = () => {
   return (
     <View className="w-full px-2 mt-3">
-      <TouchableOpacity>
+      <TouchableOpacity onPress={()=>router.push('change')}>
         <SettingTile title={"Change Password"} value={"Change your password"} />
       </TouchableOpacity>
       <TouchableOpacity>

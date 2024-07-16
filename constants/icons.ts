@@ -1,6 +1,6 @@
 const icons = {
   home: require("../assets/icons/home.png"),
-  learn: require("../assets/icons/read.png"),
+  learn: require("../assets/icons/text-box.png"),
   profile: require("../assets/icons/woman.png"),
   settings: require("../assets/icons/settings.png"),
   challenge: require("../assets/icons/challenge.png"),
@@ -19,5 +19,8 @@ const icons = {
   padlock: require("../assets/icons/padlock.png"),
   logout: require("../assets/icons/logout.png"),
   greater: require("../assets/icons/greater.png"),
+  maths: require("../assets/icons/function.png"),
+  edu: require("../assets/icons/presentation.png"),
+  edutech: require("../assets/icons/light-bulb.png"),
 };
 export default icons;

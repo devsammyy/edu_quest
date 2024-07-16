@@ -5,13 +5,13 @@ import { getData, saveData } from "@/modules/challenge/service";
 import { useQuestionState } from "@/modules/question/context";
 import { IQuestion } from "@/modules/question/model";
 import { router } from "expo-router";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { View, Text, FlatList, TouchableOpacity, Alert } from "react-native";
 import LottieView from "lottie-react-native";
 
 interface IProps {
   subject: string | any;
-  difficulty: string | undefined;
+  difficulty: string | undefined|any;
 }
 
 // Function to shuffle an array
@@ -35,14 +35,19 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
   const optionLabels = ["A", "B", "C", "D"];
 
   useEffect(() => {
+    console.log("Fetching questions for subject:", subject);
     const fetchAndShuffleQuestions = async () => {
       await getQuestions(subject);
     };
-
+    
     fetchAndShuffleQuestions();
+    console.log(questions)
   }, [subject]);
-
+  
   useEffect(() => {
+    
+    
+    console.log(subject)
     if (questions.length > 0) {
       const filteredQuestions = questions.filter(
         (q) => q.difficulty === difficulty
@@ -77,6 +82,7 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
       setStreak(streak + 1);
       if (streak === 5) {
         setShowModal(true);
+        setScore(score + 50); // Add streak bonus directly to the score
       }
     } else {
       setStreak(0);
@@ -106,14 +112,22 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
       const newResult = {
         id: user?.id,
         userId: user?.id,
+        subject: subject,
+        difficulty: difficulty,
         score: finalScore,
         xp: score,
         timestamp: new Date().toISOString(),
-        level: finalScore === "100.00" ? "Upgraded" : "easy",
+        level: finalScore === "100.00" ? getLevel(difficulty) : "none",
         streakReward: streak >= 5 ? "Streak Bonus" : "",
       };
       quizResults.push(newResult);
       await saveData("quiz_results", quizResults);
+
+      // Save specific quiz results by subject and difficulty
+      const specificQuizResultsKey = `quiz_results_${user?.id}_${subject}_${difficulty}`;
+      const specificQuizResults = (await getData(specificQuizResultsKey)) || [];
+      specificQuizResults.push(newResult);
+      await saveData(specificQuizResultsKey, specificQuizResults);
 
       const overallProgress = (await getData(
         `overall_progress_${user?.id}`
@@ -121,25 +135,102 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
         totalQuizzes: 0,
         quizzesCompleted: 0,
         points: 0,
+        highScore: 0,
+        completed: {
+          easy: false,
+          medium: false,
+          hard: false,
+        },
+        level: "Beginner",
       };
 
-      if (finalScore === "100.00") {
-        overallProgress.level = "Upgraded";
+      // Update points based on completion of difficulty levels across all subjects
+      overallProgress.points = 0;
+      if (overallProgress.completed.easy) {
+        overallProgress.points += 100;
+      }
+      if (overallProgress.completed.medium) {
+        overallProgress.points += 200;
+      }
+      if (overallProgress.completed.hard) {
+        overallProgress.points += 300;
       }
 
-      if (streak >= 5) {
-        overallProgress.streakBonus = true;
-        overallProgress.points += 50; // Bonus points for streak
+      // Update completion status based on current quiz results
+      if (difficulty === "easy" && finalScore === "100.00") {
+        overallProgress.completed.easy = true;
+      } else if (difficulty === "medium" && finalScore === "100.00") {
+        overallProgress.completed.medium = true;
+      } else if (difficulty === "hard" && finalScore === "100.00") {
+        overallProgress.completed.hard = true;
+      }
+
+      // Calculate the new points based on the updated completion status
+      if (overallProgress.completed.easy) {
+        overallProgress.points += 100;
+      }
+      if (overallProgress.completed.medium) {
+        overallProgress.points += 100; // Additional 100 points
+      }
+      if (overallProgress.completed.hard) {
+        overallProgress.points += 100; // Additional 100 points
+      }
+
+      // Cap the total points at 300
+      overallProgress.points = Math.min(overallProgress.points, 300);
+
+      // Update high score if current score is higher
+      if (score > overallProgress.highScore) {
+        overallProgress.highScore = score;
       }
 
       overallProgress.quizzesCompleted += 1;
-      overallProgress.points += score; // Correctly add points
-      overallProgress.totalQuizzes = shuffledQuestions.length;
+
+      // Upgrade level only if all questions in current difficulty level are completed with 100% score across all subjects
+      const completedAllQuestionsInDifficulty =
+        await checkCompletionInAllSubjects(difficulty);
+      if (completedAllQuestionsInDifficulty) {
+        if (difficulty === "easy") {
+          overallProgress.level = "Intermediate Scholar";
+        } else if (difficulty === "medium") {
+          overallProgress.level = "Advanced Scholar";
+        }
+      }
+
       await saveData(`overall_progress_${user?.id}`, overallProgress);
     } catch (error) {
       console.error("Failed to save quiz result:", error);
       Alert.alert("Error", "Failed to save quiz result.");
     }
+  };
+
+  const getLevel = (difficulty: string | undefined) => {
+    if (difficulty === "easy") {
+      return "Beginner";
+    } else if (difficulty === "medium") {
+      return "Intermediate Scholar";
+    } else if (difficulty === "hard") {
+      return "Advanced Scholar";
+    }
+    return "none";
+  };
+
+  const checkCompletionInAllSubjects = async (
+    difficulty: string | undefined
+  ) => {
+    const subjects = ["physics", "chemistry", "mispelled", "english"]; // Add all relevant subjects here
+    for (const subject of subjects) {
+      const quizResults = await getData(
+        `quiz_results_${user?.id}_${subject}_${difficulty}`
+      );
+      if (
+        !quizResults ||
+        !quizResults.find((result: any) => result.score === "100.00")
+      ) {
+        return false;
+      }
+    }
+    return true;
   };
 
   if (loading || shuffledQuestions.length === 0) {
@@ -170,14 +261,16 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
             {difficulty!.charAt(0).toUpperCase() + difficulty?.slice(1)}
           </Text>
         </View>
-        <Text className="font-psemibold text-xl text-white mb-5">
-          {`${currentQuestionIndex + 1}. `}
-          {shuffledQuestions[currentQuestionIndex]?.question}
+        <Text className="font-pmedium text-md text-white">
+          Question {currentQuestionIndex + 1} of {shuffledQuestions.length}
         </Text>
       </View>
+      <Text className="font-pmedium text-lg text-white mb-4">
+        {shuffledQuestions[currentQuestionIndex].question}
+      </Text>
       <FlatList
-        data={shuffledQuestions[currentQuestionIndex]?.options}
-        keyExtractor={(item, index) => index.toString()}
+        data={shuffledQuestions[currentQuestionIndex].options}
+        keyExtractor={(item) => item}
         renderItem={({ item, index }) => (
           <TouchableOpacity
             className={`px-4 border-[1px] border-main mb-2 py-3 rounded-lg ${
