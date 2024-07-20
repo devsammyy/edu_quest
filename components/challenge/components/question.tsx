@@ -32,7 +32,7 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
   const [score, setScore] = useState(0);
   const [selectedOptions, setSelectedOptions] = useState<(string | null)[]>([]);
   const [showModal, setShowModal] = useState(false);
-  const [streak, setStreak] = useState(0);
+ 
   const [timeLeft, setTimeLeft] = useState(1000); // Total time in milliseconds
   const totalTime = 1000; // Total time in milliseconds
   const optionLabels = ["A", "B", "C", "D"];
@@ -101,13 +101,6 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
       shuffledQuestions[currentQuestionIndex].answer
     ) {
       setScore(score + 1);
-      setStreak(streak + 1);
-      if (streak === 5) {
-        setShowModal(true);
-        setScore(score + 50); // Add streak bonus directly to the score
-      }
-    } else {
-      setStreak(0);
     }
 
     if (currentQuestionIndex < shuffledQuestions.length - 1) {
@@ -338,17 +331,12 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
       {showModal && (
         <CMessageModal
           visible={showModal}
-          title={streak === 5 ? "Streak Bonus!" : "Quiz Finished!"}
-          message={
-            streak === 5
-              ? "Congratulations! You answered 5 questions correctly in a row. You've earned a streak bonus!"
-              : "Congratulations! You've completed the quiz."
-          }
-          additionalMessage={`${
-            !streak
-              ? ((score / shuffledQuestions?.length) * 100).toFixed(2)
-              : ""
-          } out of 100.`}
+          title={"Quiz Finished!"}
+          message={"Congratulations! You've completed the quiz."}
+          additionalMessage={`You scored ${(
+            (score / shuffledQuestions?.length) *
+            100
+          ).toFixed(2)} out of 100.`}
           onClose={() => setShowModal(false)}
           type={"success"}
         />
