@@ -1,14 +1,23 @@
-import { Text, View, Image, TouchableOpacity } from "react-native";
-import React, { useState } from "react";
+import {
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  Switch,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
+import React, { useState, useEffect } from "react";
 import CustomButton from "../button/custom_btn";
 import CTextInput from "../inputs/text_input";
 import { ErrorMessage, Formik, FormikProps } from "formik";
 import * as Yup from "yup";
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 import { images } from "@/constants";
 import { useUserState } from "@/modules/auth/context";
 import { IUser } from "@/modules/auth/model";
 import CMessageModal from "../modal/modal";
+import * as SecureStore from "expo-secure-store";
 
 const LoginSchema = Yup.object().shape({
   username: Yup.string()
@@ -26,12 +35,44 @@ const LoginComponent = () => {
   const { login, fetchingState, setFetchingState, loading } = useUserState();
   const [status, setStatus] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
+  useEffect(() => {
+    const checkStoredCredentials = async () => {
+      const storedUsername = await SecureStore.getItemAsync(
+        "remembered_username"
+      );
+      const storedPassword = await SecureStore.getItemAsync(
+        "remembered_password"
+      );
+      if (storedUsername && storedPassword) {
+        await login(storedUsername.trim(), storedPassword.trim()).then((_) => {
+          router.replace("/home");
+        });
+      } else {
+        setIsInitialized(true);
+      }
+    };
+    checkStoredCredentials();
+  }, []);
   const handleSubmission = async (values: IUser) => {
     try {
       await login(values.username.trim(), values.password.trim());
       setStatus("Success");
       setShowModal(true);
+
+      if (rememberMe) {
+        await SecureStore.setItemAsync(
+          "remembered_username",
+          values.username.trim()
+        );
+        await SecureStore.setItemAsync(
+          "remembered_password",
+          values.password.trim()
+        );
+      }
+
       setTimeout(() => {
         router.replace("/home");
       }, 3000);
@@ -41,8 +82,20 @@ const LoginComponent = () => {
     }
   };
 
+  if (!isInitialized) {
+    return (
+      <View className="absolute z-50 flex-1 w-screen h-screen justify-center items-center">
+        <Image
+          source={images.etLogo}
+          className="w-60 h-60"
+          resizeMode="contain"
+        />
+      </View>
+    );
+  }
+
   return (
-    <View>
+    <View className="relative -z-40">
       <Image
         source={images.etLogo}
         className="rounded-xl my-4 flex-1 justify-center items-center w-full h-[150px] "
@@ -101,6 +154,18 @@ const LoginComponent = () => {
               </Text>
             ) : null}
 
+            <View className="flex-row items-center mt-3">
+              <Text className="text-lg font-psemibold text-white ml-2">
+                Remember Me
+              </Text>
+              <Switch
+                value={rememberMe}
+                onValueChange={() => setRememberMe(!rememberMe)}
+                trackColor={{ true: "#ffa001" }}
+                thumbColor={"#fff"}
+              />
+            </View>
+
             <TouchableOpacity
               onPress={() => router.replace("/change")}
               className="flex-1 my-3 items-end"
@@ -116,6 +181,20 @@ const LoginComponent = () => {
               containerStyles="mt-3"
               disabled={false}
             />
+
+            <View className="justify-center pt-5 flex-row gap-2">
+              <Text className="text-lg font-pregular text-gray-100">
+                Don't have account?
+              </Text>
+              <TouchableOpacity
+                onPress={() => router.replace("/register")}
+                className="my-3 items-end"
+              >
+                <Text className="text-lg font-psemibold text-main">
+                  Register?
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         )}
       </Formik>

@@ -23,7 +23,7 @@ interface Item {
 }
 
 interface IProps {
-  selectedIndex?: number;
+  selectedIndex?: number | undefined;
   items: Array<Item>;
   isStepper?: boolean;
   containerClassName?: string | undefined;

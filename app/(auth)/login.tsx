@@ -18,19 +18,6 @@ const Register = () => {
         <View className="w-full justify-center min-h-[86vh] px-4 my-6">
           <LoginComponent />
 
-          <View className="justify-center pt-5 flex-row gap-2">
-            <Text className="text-lg font-pregular text-gray-100">
-              Don't have account?
-            </Text>
-            <TouchableOpacity
-              onPress={() => router.replace("/register")}
-              className="my-3 items-end"
-            >
-              <Text className="text-lg font-psemibold text-main">
-                Register?
-              </Text>
-            </TouchableOpacity>
-          </View>
         </View>
       </ScrollView>
     </SafeAreaView>

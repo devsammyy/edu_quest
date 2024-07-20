@@ -96,7 +96,7 @@ const CMessageModal: React.FC<ICMessage> = ({
               >
                 <Text className="font-psemibold text-xl text-white">x</Text>
               </TouchableOpacity>
-              <Text className="text-white text-md font-pbold">{message}!</Text>
+              <Text className="text-white text-md font-pbold">{message}</Text>
               {type === "success" && (
                 <Icon name="check-circle" size={100} color="green" />
               )}

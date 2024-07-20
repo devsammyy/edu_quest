@@ -32,13 +32,12 @@ export const getSingleQuestionsByName = async (
 
 export const getAllofQuestions = async () => {
   return [
-    { id: 1, name: "English", questions: english },
-    { id: 2, name: "Physics", questions: physics },
-    { id: 3, name: "Chemistry", questions: chemistry },
-    { id: 4, name: "Mispelled", questions: englisMispellet },
-    { id: 5, name: "Maths", questions: maths },
-    { id: 6, name: "Edu", questions: edu },
-    { id: 7, name: "Edutech", questions: edutech },
+    { id: 1, name: "Edutech", questions: edutech },
+    { id: 2, name: "Edu", questions: edu },
+    { id: 3, name: "English", questions: english },
+    { id: 4, name: "Maths", questions: maths },
+    { id: 5, name: "Physics", questions: physics },
+    { id: 6, name: "Chemistry", questions: chemistry },
   ];
 };
 

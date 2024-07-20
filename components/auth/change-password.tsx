@@ -9,6 +9,7 @@ import CTextInput from "@/components/inputs/text_input";
 import { useUserState } from "@/modules/auth/context";
 import CMessageModal from "../modal/modal";
 import { router } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 
 const ChangeSchema = Yup.object().shape({
   email: Yup.string().email().required("Please enter a valid email address"),
@@ -21,18 +22,19 @@ const ChangeSchema = Yup.object().shape({
 });
 
 const ChangePasswordScreen = () => {
-  const {updateUser, loading, fetchingState} = useUserState()
-  const [showModal, setShowModal] = useState(false)
-  const [isError, setIsError] = useState(false)
+  const { updateUser, loading, fetchingState } = useUserState();
+  const [showModal, setShowModal] = useState(false);
+  const [isError, setIsError] = useState(false);
 
-  const handleSubmission = (values: any) => {
-    
-    updateUser(values).then((_)=>{
-      setShowModal(true)
-      setTimeout(()=>{
-        router.replace("login")
-      },2000)
-    })
+  const handleSubmission = async (values: any) => {
+    await SecureStore.deleteItemAsync("remembered_username");
+    await SecureStore.deleteItemAsync("remembered_password");
+    updateUser(values).then((_) => {
+      setShowModal(true);
+      setTimeout(() => {
+        router.replace("login");
+      }, 2000);
+    });
   };
 
   return (
@@ -117,22 +119,19 @@ const ChangePasswordScreen = () => {
               containerStyles="mt-3"
               disabled={false}
             />
-        <CMessageModal
-          visible={showModal}
-          title={`${!isError ? "Success" : "Error!"}`}
-          message={`${!isError ? fetchingState : fetchingState}`}
-          additionalMessage={`${
-            !isError
-              ? "You will be redirected to the login page"
-              : ""
-          }`}
-          onClose={() => setShowModal(!showModal)}
-          className="rounded-lg"
-          type={`${!isError ? "success" : "error"}`}
-        />
+            <CMessageModal
+              visible={showModal}
+              title={`${!isError ? "Success" : "Error!"}`}
+              message={`${!isError ? fetchingState : fetchingState}`}
+              additionalMessage={`${
+                !isError ? "You will be redirected to the login page" : ""
+              }`}
+              onClose={() => setShowModal(!showModal)}
+              className="rounded-lg"
+              type={`${!isError ? "success" : "error"}`}
+            />
           </View>
         )}
-
       </Formik>
     </View>
   );

@@ -22,5 +22,8 @@ const icons = {
   maths: require("../assets/icons/function.png"),
   edu: require("../assets/icons/presentation.png"),
   edutech: require("../assets/icons/light-bulb.png"),
+  book: require("../assets/icons/book.png"),
+
+  dictionary: require("../assets/icons/dictionary.png"),
 };
 export default icons;

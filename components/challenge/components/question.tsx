@@ -5,13 +5,14 @@ import { getData, saveData } from "@/modules/challenge/service";
 import { useQuestionState } from "@/modules/question/context";
 import { IQuestion } from "@/modules/question/model";
 import { router } from "expo-router";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { View, Text, FlatList, TouchableOpacity, Alert } from "react-native";
 import LottieView from "lottie-react-native";
+import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
 
 interface IProps {
   subject: string | any;
-  difficulty: string | undefined|any;
+  difficulty: string | undefined | any;
 }
 
 // Function to shuffle an array
@@ -32,18 +33,18 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
   const [selectedOptions, setSelectedOptions] = useState<(string | null)[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [streak, setStreak] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(1000); // Total time in milliseconds
+  const totalTime = 1000; // Total time in milliseconds
   const optionLabels = ["A", "B", "C", "D"];
 
   useEffect(() => {
-    
     const fetchAndShuffleQuestions = async () => {
       await getQuestions(subject);
     };
-    
+
     fetchAndShuffleQuestions();
-    
   }, [subject]);
-  
+
   useEffect(() => {
     if (questions.length > 0) {
       const filteredQuestions = questions.filter(
@@ -63,6 +64,30 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
       console.log("No questions available or fetching failed.");
     }
   }, [questions, difficulty]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prevTime) => {
+        if (prevTime <= 1) {
+          clearInterval(timer); // Clear the interval when time is up
+          handleSaveResult(); // Call handleSaveResult when time is up
+          return 0;
+        }
+        return prevTime - 1; // Decrease time by 10 milliseconds
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleSaveResult = async () => {
+    await saveQuizResult().then((_) => {
+      setShowModal(true);
+      setTimeout(() => {
+        router.replace("/home");
+      }, 3000);
+    });
+  };
 
   const handleOptionPress = (option: string) => {
     const newSelectedOptions = [...selectedOptions];
@@ -104,56 +129,52 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
 
   const saveQuizResult = async () => {
     try {
+      // Retrieve existing quiz results and overall progress
       const quizResults = (await getData("quiz_results")) || [];
-      const finalScore = ((score / shuffledQuestions.length) * 100).toFixed(2);
-      const newResult = {
-        id: user?.id,
-        userId: user?.id,
-        subject: subject,
-        difficulty: difficulty,
-        score: finalScore,
-        xp: score,
-        timestamp: new Date().toISOString(),
-        level: finalScore === "100.00" ? getLevel(difficulty) : "none",
-        streakReward: streak >= 5 ? "Streak Bonus" : "",
-      };
-      quizResults.push(newResult);
-      await saveData("quiz_results", quizResults);
-
-      // Save specific quiz results by subject and difficulty
-      const specificQuizResultsKey = `quiz_results_${user?.id}_${subject}_${difficulty}`;
-      const specificQuizResults = (await getData(specificQuizResultsKey)) || [];
-      specificQuizResults.push(newResult);
-      await saveData(specificQuizResultsKey, specificQuizResults);
-
       const overallProgress = (await getData(
         `overall_progress_${user?.id}`
       )) || {
         totalQuizzes: 0,
-        quizzesCompleted: 0,
-        points: 0,
-        highScore: 0,
+        highScore: 0, // High score across all subjects
         completed: {
           easy: false,
           medium: false,
           hard: false,
         },
         level: "Beginner",
+        points: 0, // Ensure 'points' exists
       };
 
-      // Update points based on completion of difficulty levels across all subjects
-      overallProgress.points = 0;
-      if (overallProgress.completed.easy) {
-        overallProgress.points += 100;
-      }
-      if (overallProgress.completed.medium) {
-        overallProgress.points += 200;
-      }
-      if (overallProgress.completed.hard) {
-        overallProgress.points += 300;
-      }
+      // Calculate the exact score and XP
+      const finalScore = ((score / shuffledQuestions.length) * 100).toFixed(2); // Calculate exact score percentage
+      const newXP = score; // XP is equal to the score
 
-      // Update completion status based on current quiz results
+      // Update the XP in overall progress
+      overallProgress.points += newXP;
+
+      // Prepare new result
+      const newResult = {
+        id: user?.id,
+        userId: user?.id,
+        subject: subject,
+        difficulty: difficulty,
+        score: score, // Save exact score
+        xp: newXP, // XP earned in this quiz attempt
+        timestamp: new Date().toISOString(),
+        level: finalScore === "100.00" ? getLevel(difficulty) : "none",
+      };
+
+      // Save new quiz result
+      quizResults.push(newResult);
+      await saveData("quiz_results", quizResults);
+
+      // Save specific quiz results
+      const specificQuizResultsKey = `quiz_results_${user?.id}_${subject}_${difficulty}`;
+      const specificQuizResults = (await getData(specificQuizResultsKey)) || [];
+      specificQuizResults.push(newResult);
+      await saveData(specificQuizResultsKey, specificQuizResults);
+
+      // Update overall progress
       if (difficulty === "easy" && finalScore === "100.00") {
         overallProgress.completed.easy = true;
       } else if (difficulty === "medium" && finalScore === "100.00") {
@@ -162,28 +183,12 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
         overallProgress.completed.hard = true;
       }
 
-      // Calculate the new points based on the updated completion status
-      if (overallProgress.completed.easy) {
-        overallProgress.points += 100;
-      }
-      if (overallProgress.completed.medium) {
-        overallProgress.points += 100; // Additional 100 points
-      }
-      if (overallProgress.completed.hard) {
-        overallProgress.points += 100; // Additional 100 points
-      }
-
-      // Cap the total points at 300
-      overallProgress.points = Math.min(overallProgress.points, 300);
-
-      // Update high score if current score is higher
+      // Update high score if the current score is higher
       if (score > overallProgress.highScore) {
         overallProgress.highScore = score;
       }
 
-      overallProgress.quizzesCompleted += 1;
-
-      // Upgrade level only if all questions in current difficulty level are completed with 100% score across all subjects
+      // Check if the player has completed all questions in the current difficulty
       const completedAllQuestionsInDifficulty =
         await checkCompletionInAllSubjects(difficulty);
       if (completedAllQuestionsInDifficulty) {
@@ -194,6 +199,7 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
         }
       }
 
+      // Save updated overall progress
       await saveData(`overall_progress_${user?.id}`, overallProgress);
     } catch (error) {
       console.error("Failed to save quiz result:", error);
@@ -215,7 +221,7 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
   const checkCompletionInAllSubjects = async (
     difficulty: string | undefined
   ) => {
-    const subjects = ["physics", "chemistry", "mispelled", "english"]; // Add all relevant subjects here
+    const subjects = ["physics", "chemistry", "mispelled", "english"];
     for (const subject of subjects) {
       const quizResults = await getData(
         `quiz_results_${user?.id}_${subject}_${difficulty}`
@@ -246,14 +252,21 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
     );
   }
 
+  const timerWidth = (timeLeft / totalTime) * 90;
+
   return (
     <View className="w-full">
-      <View className="mb-4 p-4 bg-slate-800 rounded-lg">
+      <View className="mb-15 p-4 bg-slate-800 rounded-lg">
         <View className="flex-row justify-between">
           <Text className="font-psemibold text-md text-white mb-5">
-            Subject: {subject.charAt(0).toUpperCase() + subject.slice(1)}
+            Subject:{" "}
+            {subject === "physics"
+              ? "Science & Tech"
+              : subject === "chemistry"
+              ? "General Knowledge"
+              : subject.charAt(0).toUpperCase() + subject.slice(1)}
           </Text>
-          <Text className="font-psemibold text-md text-white mb-5">
+          <Text className="font-psemibold text-md text-white">
             Difficulty:{" "}
             {difficulty!.charAt(0).toUpperCase() + difficulty?.slice(1)}
           </Text>
@@ -262,7 +275,25 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
           Question {currentQuestionIndex + 1} of {shuffledQuestions.length}
         </Text>
       </View>
-      <Text className="font-pmedium text-lg text-white mb-4">
+
+      <View className="self-center my-5">
+        <CountdownCircleTimer
+          isPlaying
+          size={100}
+          duration={timerWidth}
+          colors={["#ffa001", "#f77001", "#A30000", "#A30000"]}
+          colorsTime={[7, 5, 2, 0]}
+          onComplete={() => {
+            handleSaveResult();
+            setTimeLeft(0);
+          }}
+        >
+          {({ remainingTime }) => (
+            <Text className="text-white text-2xl">{remainingTime}</Text>
+          )}
+        </CountdownCircleTimer>
+      </View>
+      <Text className="font-pmedium text-xl text-white mb-4">
         {shuffledQuestions[currentQuestionIndex].question}
       </Text>
       <FlatList
@@ -270,7 +301,7 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
         keyExtractor={(item) => item}
         renderItem={({ item, index }) => (
           <TouchableOpacity
-            className={`px-4 border-[1px] border-main mb-2 py-3 rounded-lg ${
+            className={`px-4 mb-3 border-[1px] border-main py-4 rounded-lg ${
               item === selectedOptions[currentQuestionIndex] &&
               "bg-main rounded-lg"
             }`}
@@ -280,7 +311,7 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
           </TouchableOpacity>
         )}
       />
-      <View className="flex-row justify-between mt-8">
+      <View className="flex-row justify-between mt-15">
         <CustomButton
           title="Previous"
           handlePress={handlePreviousQuestion}
@@ -293,13 +324,13 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
         <CustomButton
           title={
             currentQuestionIndex < shuffledQuestions.length - 1
-              ? "Next "
+              ? "Next"
               : "Finish Quiz"
           }
           handlePress={handleNextQuestion}
           disabled={!selectedOptions[currentQuestionIndex]}
-          containerStyles={`w-1/2 text-white  ${
-            !selectedOptions[currentQuestionIndex] && "bg-slate-800"
+          containerStyles={`w-1/2 text-white ${
+            !selectedOptions[currentQuestionIndex] && "bg-slate-800 p-[-10px]"
           }`}
           textColor="text-white"
         />
@@ -307,15 +338,19 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
       {showModal && (
         <CMessageModal
           visible={showModal}
-          title={`Challenge Completed`}
-          message={`
-        You scored ${((score / shuffledQuestions?.length) * 100).toFixed(
-          2
-        )} out of 100. ${streak >= 5 ? "You earned a streak bonus!" : ""}
-        ${score === 100.0 ? "Level Up!" : ""}`}
-          onClose={() => setShowModal(!showModal)}
-          className="rounded-lg"
-          type={`success`}
+          title={streak === 5 ? "Streak Bonus!" : "Quiz Finished!"}
+          message={
+            streak === 5
+              ? "Congratulations! You answered 5 questions correctly in a row. You've earned a streak bonus!"
+              : "Congratulations! You've completed the quiz."
+          }
+          additionalMessage={`${
+            !streak
+              ? ((score / shuffledQuestions?.length) * 100).toFixed(2)
+              : ""
+          } out of 100.`}
+          onClose={() => setShowModal(false)}
+          type={"success"}
         />
       )}
     </View>
@@ -323,3 +358,4 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
 };
 
 export default Question;
+

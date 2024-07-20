@@ -65,7 +65,7 @@ const QuestionCard: React.FC<IProps> = ({ name, icon }) => {
             tintColor={"#f4f4f4"}
             resizeMode="contain"
           />
-          <Text className=" text-white text-lg mt-3 font-psemibold">
+          <Text className=" text-white text-center text-lg mt-3 font-psemibold">
             {name === "Mispelled"
               ? "Mispelled Words"
               : name === "Edu"
@@ -74,6 +74,12 @@ const QuestionCard: React.FC<IProps> = ({ name, icon }) => {
               ? "Mathematics"
               : name === "Edutech"
               ? "Educational Technology"
+              : name === "English"
+              ? "Vocalbulary"
+              : name === "Physics"
+              ? "Science & Tech"
+              : name === "Chemistry"
+              ? "General Knowledge"
               : name}
           </Text>
         </LinearGradient>

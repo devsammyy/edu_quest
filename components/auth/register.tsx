@@ -9,6 +9,7 @@ import CMessageModal from "../modal/modal";
 import { Link, router } from "expo-router";
 import { useUserState } from "@/modules/auth/context";
 import { TouchableOpacity } from "react-native";
+import { IUser } from "@/modules/auth/model";
 
 const RegisterSchema = Yup.object().shape({
   username: Yup.string()
@@ -20,7 +21,7 @@ const RegisterSchema = Yup.object().shape({
     .required("Email is required"),
   matricNo: Yup.string()
     .required("Matric number is required")
-    .matches(/^\d{2}\/\d{2}[A-Z]{2}\d{3}$/, "Invalid Matric Number format")
+    .matches(/^\d{2}\/\d{2}[a-z]{2}\d{3}$/, "Invalid Matric Number format")
     .min(3, "Matric number is too short")
     .max(50, "Matric number is too long"),
   fullName: Yup.string()
@@ -39,9 +40,17 @@ const RegisterComponent = () => {
   const [status, setStatus] = useState("");
   const [showModal, setShowModal] = useState(false);
 
-  const handleSubmission = async (values: any) => {
+  const handleSubmission = async (values: IUser) => {
+    const sanitizedValues: any = {
+      email: values.email.trim(),
+      fullName: values.fullName.trim(),
+      matricNo: values.matricNo.trim(),
+      password: values.password.trim(),
+      username: values.username.trim(),
+    };
+
     try {
-      await registerUser(values);
+      await registerUser(sanitizedValues);
       setStatus("Success");
       setShowModal(true);
       setTimeout(() => {
@@ -72,7 +81,7 @@ const RegisterComponent = () => {
           password: "",
         }}
         validationSchema={RegisterSchema}
-        onSubmit={(values) => handleSubmission(values)}
+        onSubmit={(values: any) => handleSubmission(values)}
       >
         {({
           values,

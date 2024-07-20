@@ -10,13 +10,13 @@ const ChallengeComponent = () => {
   const mapIcon = (icon: string) => {
     switch (icon) {
       case "English":
-        return icons.vocabulary;
+        return icons.dictionary;
 
       case "Physics":
-        return icons.enzyme;
+        return icons.atom;
 
       case "Chemistry":
-        return icons.atom;
+        return icons.book;
 
       case "Mispelled":
         return icons.learn;
@@ -24,7 +24,7 @@ const ChallengeComponent = () => {
       case "Maths":
         return icons.maths;
 
-      case "Education":
+      case "Edu":
         return icons.edu;
 
       case "Edutech":
@@ -63,7 +63,7 @@ const ChallengeComponent = () => {
       )}
       numColumns={2}
       ListHeaderComponent={() => (
-        <Text className="font-psemibold text-center text-white mt-8 mb-5 pl-20 text-2xl">
+        <Text className="font-psemibold text-white mt-8 mb-5 pl-20 text-2xl">
           All Categories
         </Text>
       )}

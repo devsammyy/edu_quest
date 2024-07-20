@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { ContextProvider } from "@/context";
 import { useUserState } from "@/modules/auth/context";
 import * as SecureStore from "expo-secure-store";
+import { login } from "@/modules/auth/service";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -22,6 +23,7 @@ export default function RootLayout() {
   });
   useEffect(() => {
     if (error) throw error;
+
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded, error]);
   if (!fontsLoaded && !error) return null;
@@ -33,6 +35,7 @@ export default function RootLayout() {
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="(questions)" options={{ headerShown: false }} />
+        <Stack.Screen name="about" options={{ headerShown: false }} />
       </Stack>
     </ContextProvider>
   );
