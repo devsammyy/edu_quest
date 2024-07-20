@@ -5,16 +5,16 @@ export const getSingleQuestionsByName = async (
   name: "english" | "physics" | "chemistry" | "mispelled" | "maths" | "edu" | "edutech"
 ) => {
   
-     switch (name) {
+    switch (name) {
       case "english":
         return english as IQuestion[];
-        
+
       case "physics":
         return physics as IQuestion[];
-        
+
       case "chemistry":
         return chemistry as IQuestion[];
-        
+
       case "mispelled":
         return englisMispellet as IQuestion[];
       case "edu":
@@ -25,7 +25,6 @@ export const getSingleQuestionsByName = async (
         return edutech as IQuestion[];
       default:
         return [];
-        
     }
   
 };

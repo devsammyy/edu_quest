@@ -59,10 +59,14 @@ export const QuestionContextProvider: React.FC<IProps> = ({ children }) => {
     setLoading(true);
     try {
       const questions = await getSingleQuestionsByName(name as any);
-      setQuestions(questions);
+      if (questions) {
+        setQuestions(questions);
+      } else {
+        throw new Error("Failed to get questions");
+      }
     } catch (error: any) {
       console.error("Error registering user:", error);
-      throw error; // Re-throw error for further handling if needed
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -82,7 +86,6 @@ export const QuestionContextProvider: React.FC<IProps> = ({ children }) => {
 
   const getAllQuestions = async () => {
     setLoading(true);
-
     try {
       const allQuestions = await getAllofQuestions();
       setAllQuestions(allQuestions as any);

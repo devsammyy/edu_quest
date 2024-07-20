@@ -36,20 +36,21 @@ const Question: React.FC<IProps> = ({ subject, difficulty }) => {
   const [timeLeft, setTimeLeft] = useState(1000); // Total time in milliseconds
   const totalTime = 1000; // Total time in milliseconds
   const optionLabels = ["A", "B", "C", "D"];
+  
+  const fetchAndShuffleQuestions = async () => {
+    await getQuestions(subject);
+  };
 
   useEffect(() => {
-    const fetchAndShuffleQuestions = async () => {
-      await getQuestions(subject);
-    };
-
     fetchAndShuffleQuestions();
   }, [subject]);
+  
+  const filteredQuestions = questions.filter(
+    (q) => q.difficulty === difficulty
+  );
 
   useEffect(() => {
     if (questions.length > 0) {
-      const filteredQuestions = questions.filter(
-        (q) => q.difficulty === difficulty
-      );
       const shuffled = shuffleArray([...filteredQuestions]);
       const shuffledQuestionsWithShuffledOptions = shuffled.map((question) => ({
         ...question,
