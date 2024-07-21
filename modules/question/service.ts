@@ -1,32 +1,37 @@
 import { IQuestion } from "./model";
 import { english, physics, chemistry, englisMispellet, edu, maths, edutech } from "./questions";
 
-export const getSingleQuestionsByName = async (
-  name: "english" | "physics" | "chemistry" | "mispelled" | "maths" | "edu" | "edutech"
+export const getSingleQuestionsByName = (
+  name:
+    | "english"
+    | "physics"
+    | "chemistry"
+    | "mispelled"
+    | "maths"
+    | "edu"
+    | "edutech"
 ) => {
-  
-    switch (name) {
-      case "english":
-        return english as IQuestion[];
+  switch (name) {
+    case "english":
+      return english as IQuestion[];
 
-      case "physics":
-        return physics as IQuestion[];
+    case "physics":
+      return physics as IQuestion[];
 
-      case "chemistry":
-        return chemistry as IQuestion[];
+    case "chemistry":
+      return chemistry as IQuestion[];
 
-      case "mispelled":
-        return englisMispellet as IQuestion[];
-      case "edu":
-        return edu as IQuestion[];
-      case "maths":
-        return maths as IQuestion[];
-      case "edutech":
-        return edutech as IQuestion[];
-      default:
-        return [];
-    }
-  
+    case "mispelled":
+      return englisMispellet as IQuestion[];
+    case "edu":
+      return edu as IQuestion[];
+    case "maths":
+      return maths as IQuestion[];
+    case "edutech":
+      return edutech as IQuestion[];
+    default:
+      return [];
+  }
 };
 
 export const getAllofQuestions = async () => {

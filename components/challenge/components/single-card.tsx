@@ -75,7 +75,7 @@ const QuestionCard: React.FC<IProps> = ({ name, icon }) => {
               : name === "Edutech"
               ? "Educational Technology"
               : name === "English"
-              ? "Vocalbulary"
+              ? "Vocabulary"
               : name === "Physics"
               ? "Science & Tech"
               : name === "Chemistry"

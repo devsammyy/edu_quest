@@ -8,8 +8,8 @@ const Edu = () => {
   const { difficulty, name } = useLocalSearchParams();
   console.log(difficulty, name);
   return (
-    <SafeAreaView className="bg-primary h-full">
-      <View className="w-full items-center justify-center min-h-[83vh] px-4 my-6">
+    <SafeAreaView className="relative bg-primary h-full">
+      <View className="items-center justify-center px-4 mb-8">
         <Question subject={name} difficulty={difficulty} />
       </View>
     </SafeAreaView>

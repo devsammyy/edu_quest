@@ -58,14 +58,12 @@ export const QuestionContextProvider: React.FC<IProps> = ({ children }) => {
   const getQuestions = async (name: string) => {
     setLoading(true);
     try {
-      const questions = await getSingleQuestionsByName(name as any);
-      if (questions) {
-        setQuestions(questions);
-      } else {
-        throw new Error("Failed to get questions");
+      const quest = getSingleQuestionsByName(name as any);
+      if (quest) {
+        setQuestions(quest);
       }
     } catch (error: any) {
-      console.error("Error registering user:", error);
+      console.error("Error", error);
       throw error;
     } finally {
       setLoading(false);
